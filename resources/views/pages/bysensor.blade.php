@@ -1,57 +1,23 @@
 @extends('master')
 @section('content')
+<h5 class="text-center mt-4">{{ $sensor }}</h5>
+<hr>
 <div class="row">
     <!-- BEGIN col-6 -->
-    <div class="col-xl-4">
+    <div class="col-xl-12">
         <!-- BEGIN card -->
         <div class="card mb-3">
             <!-- BEGIN card-body -->
             <div class="card-body">
                 <!-- BEGIN title -->
                 <div class="d-flex fw-bold small mb-3">
-                    <span class="flex-grow-1">Total Attack</span>
-                </div>
-                <div class="mb-3">
-                   <h2>2,000,000</h2>
-                </div>
-
-                <div class="d-flex fw-bold small mb-3">
-                    <span class="flex-grow-1">Average per day</span>
-                </div>
-                <div class="mb-3">
-                   <h2>300,000</h2>
-                </div>
-            </div>
-            <!-- END card-body -->
-            
-            <!-- BEGIN card-arrow -->
-            <div class="card-arrow">
-                <div class="card-arrow-top-left"></div>
-                <div class="card-arrow-top-right"></div>
-                <div class="card-arrow-bottom-left"></div>
-                <div class="card-arrow-bottom-right"></div>
-            </div>
-            <!-- END card-arrow -->
-        </div>
-        <!-- END card -->
-    </div>
-    <!-- END col-6 -->
-    
-    <!-- BEGIN col-6 -->
-    <div class="col-xl-8">
-        <!-- BEGIN card -->
-        <div class="card mb-3">
-            <!-- BEGIN card-body -->
-            <div class="card-body">
-                <!-- BEGIN title -->
-                <div class="d-flex fw-bold small mb-3">
-                    <span class="flex-grow-1">Threat Map</span>
+                    <span class="flex-grow-1">Frequent</span>
                     <a href="#" data-toggle="card-expand" class="text-inverse text-opacity-50 text-decoration-none"><i class="bi bi-fullscreen"></i></a>
                 </div>
                 <!-- END title -->
-                <!-- BEGIN map -->
-                <div class="ratio ratio-21x9 mb-3">
-                    <div id="world-map" class="jvectormap-without-padding"></div>
+                <!-- BEGIN chart -->
+                <div class="mb-3">
+                    <div id="chart-server"></div>
                 </div>
             </div>
             <!-- END card-body -->

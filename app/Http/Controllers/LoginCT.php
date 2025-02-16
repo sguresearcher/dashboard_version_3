@@ -22,6 +22,8 @@ class LoginCT extends Controller
  
             if (Auth::user()->role == 'superadmin') {
                 return redirect('/superadmin');
+            }else{
+                return redirect('/');
             }
         }
  

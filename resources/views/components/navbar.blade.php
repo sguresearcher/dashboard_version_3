@@ -46,10 +46,11 @@
             </a>
             <div class="dropdown-menu dropdown-menu-end me-lg-3 fs-11px mt-1">
                @auth
-               <a class="dropdown-item d-flex align-items-center" href="profile.html">PROFILE <i class="bi bi-person-circle ms-auto text-theme fs-16px my-n1"></i></a>
-               <a class="dropdown-item d-flex align-items-center" href="email_inbox.html">INBOX <i class="bi bi-envelope ms-auto text-theme fs-16px my-n1"></i></a>
-               <a class="dropdown-item d-flex align-items-center" href="calendar.html">CALENDAR <i class="bi bi-calendar ms-auto text-theme fs-16px my-n1"></i></a>
-               <a class="dropdown-item d-flex align-items-center" href="settings.html">SETTINGS <i class="bi bi-gear ms-auto text-theme fs-16px my-n1"></i></a>
+               @if (auth()->user()->role == 'superadmin')
+               <a class="dropdown-item d-flex align-items-center" href="/superadmin/setting">SETTINGS <i class="bi bi-gear ms-auto text-theme fs-16px my-n1"></i></a>
+               @else
+               <a class="dropdown-item d-flex align-items-center" href="/setting">SETTINGS <i class="bi bi-gear ms-auto text-theme fs-16px my-n1"></i></a>
+               @endif
                <div class="dropdown-divider"></div>
                <form action="/logout" method="POST">
                @csrf
