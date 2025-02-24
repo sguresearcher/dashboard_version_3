@@ -4,20 +4,58 @@
 <hr>
 <div class="row">
     <!-- BEGIN col-6 -->
-    <div class="col-xl-12">
+    <div class="col-md-6">
         <!-- BEGIN card -->
         <div class="card mb-3">
             <!-- BEGIN card-body -->
             <div class="card-body">
                 <!-- BEGIN title -->
-                <div class="d-flex fw-bold small mb-3">
-                    <span class="flex-grow-1">Frequent</span>
-                    <a href="#" data-toggle="card-expand" class="text-inverse text-opacity-50 text-decoration-none"><i class="bi bi-fullscreen"></i></a>
+                <div id="chartJsLineChart" class="mb-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>Attack</h6>
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                        <div class="card-arrow">
+                            <div class="card-arrow-top-left"></div>
+                            <div class="card-arrow-top-right"></div>
+                            <div class="card-arrow-bottom-left"></div>
+                            <div class="card-arrow-bottom-right"></div>
+                        </div>
+                    </div>
                 </div>
-                <!-- END title -->
-                <!-- BEGIN chart -->
+            </div>
+            <!-- END card-body -->
+            
+            <!-- BEGIN card-arrow -->
+            <div class="card-arrow">
+                <div class="card-arrow-top-left"></div>
+                <div class="card-arrow-top-right"></div>
+                <div class="card-arrow-bottom-left"></div>
+                <div class="card-arrow-bottom-right"></div>
+            </div>
+            <!-- END card-arrow -->
+        </div>
+        <!-- END card -->
+    </div>
+    <div class="col-md-6">
+        <!-- BEGIN card -->
+        <div class="card mb-3" style="height: 95%">
+            <!-- BEGIN card-body -->
+            <div class="card-body">
+                <!-- BEGIN title -->
+                <div class="d-flex fw-bold small mb-3">
+                    <span class="flex-grow-1">Total Attack</span>
+                </div>
                 <div class="mb-3">
-                    <div id="chart-server"></div>
+                   <h2>2,000,000</h2>
+                </div>
+
+                <div class="d-flex fw-bold small mb-3">
+                    <span class="flex-grow-1">Average per day</span>
+                </div>
+                <div class="mb-3">
+                   <h2>300,000</h2>
                 </div>
             </div>
             <!-- END card-body -->
@@ -35,25 +73,25 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-6">
         <div class="card">
             <div class="card-body">
-                <table id="datatableDefault" class="table text-nowrap w-100">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Sensor</th>
-                            <th>Count</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1.</td>
-                            <td>Honeytrap</td>
-                            <td>6000</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div id="chartJsDoughnutChart">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>Most Used ASN</h6>
+                            <div class="h-300px w-300px mx-auto">
+                                <canvas id="doughnutChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card-arrow">
+                            <div class="card-arrow-top-left"></div>
+                            <div class="card-arrow-top-right"></div>
+                            <div class="card-arrow-bottom-left"></div>
+                            <div class="card-arrow-bottom-right"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="card-arrow">
                 <div class="card-arrow-top-left"></div>
@@ -61,63 +99,13 @@
                 <div class="card-arrow-bottom-left"></div>
                 <div class="card-arrow-bottom-right"></div>
             </div>
-            {{-- <div class="hljs-container">
-                <pre><code class="xml" data-url="assets/data/table-plugins/code-1.json"></code></pre>
-            </div> --}}
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <table id="datatableDefault" class="table text-nowrap w-100">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Country</th>
-                            <th>Count</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1.</td>
-                            <td>Germany</td>
-                            <td>8000</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="card-arrow">
-                <div class="card-arrow-top-left"></div>
-                <div class="card-arrow-top-right"></div>
-                <div class="card-arrow-bottom-left"></div>
-                <div class="card-arrow-bottom-right"></div>
-            </div>
-            {{-- <div class="hljs-container">
-                <pre><code class="xml" data-url="assets/data/table-plugins/code-1.json"></code></pre>
-            </div> --}}
         </div>
     </div>
     <div class="col-md-6">
         <div class="card">
             <div class="card-body">
-                <table id="datatableDefault" class="table text-nowrap w-100">
-                    <thead>
-                            <th>No</th>
-                            <th>Source Ip</th>
-                            <th>Destination Ip</th>
-                            <th>Category</th>
-                            <th>Port</th>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1.</td>
-                            <td>103.170.100.111</td>
-                            <td>103.168.181.177</td>
-                            <td>Honeytrap</td>
-                            <td>8000</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <h6 class="mb-4">Top 10 Attacker IP</h6>
+                <canvas id="barChart"></canvas>
             </div>
             <div class="card-arrow">
                 <div class="card-arrow-top-left"></div>
@@ -125,9 +113,6 @@
                 <div class="card-arrow-bottom-left"></div>
                 <div class="card-arrow-bottom-right"></div>
             </div>
-            {{-- <div class="hljs-container">
-                <pre><code class="xml" data-url="assets/data/table-plugins/code-1.json"></code></pre>
-            </div> --}}
         </div>
     </div>
 </div>

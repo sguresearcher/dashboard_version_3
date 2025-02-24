@@ -40,30 +40,19 @@
     <!-- BEGIN col-6 -->
     <div class="col-xl-8">
         <!-- BEGIN card -->
-        <div class="card mb-3">
-            <!-- BEGIN card-body -->
-            <div class="card-body">
-                <!-- BEGIN title -->
-                <div class="d-flex fw-bold small mb-3">
-                    <span class="flex-grow-1">Threat Map</span>
-                    <a href="#" data-toggle="card-expand" class="text-inverse text-opacity-50 text-decoration-none"><i class="bi bi-fullscreen"></i></a>
+        <div id="jVectorMap" class="mb-5">
+            <h4>Threat Map</h4>
+            <div class="card">
+                <div class="card-body">
+                    <div id="jvectorMap" style="height: 300px;"></div>
                 </div>
-                <!-- END title -->
-                <!-- BEGIN map -->
-                <div class="ratio ratio-21x9 mb-3">
-                    <div id="world-map" class="jvectormap-without-padding"></div>
+                <div class="card-arrow">
+                    <div class="card-arrow-top-left"></div>
+                    <div class="card-arrow-top-right"></div>
+                    <div class="card-arrow-bottom-left"></div>
+                    <div class="card-arrow-bottom-right"></div>
                 </div>
             </div>
-            <!-- END card-body -->
-            
-            <!-- BEGIN card-arrow -->
-            <div class="card-arrow">
-                <div class="card-arrow-top-left"></div>
-                <div class="card-arrow-top-right"></div>
-                <div class="card-arrow-bottom-left"></div>
-                <div class="card-arrow-bottom-right"></div>
-            </div>
-            <!-- END card-arrow -->
         </div>
         <!-- END card -->
     </div>
