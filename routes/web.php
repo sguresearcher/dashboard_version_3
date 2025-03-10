@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\GuestCT;
 use App\Http\Controllers\LoginCT;
 use App\Http\Controllers\SuperadminCT;
 use App\Http\Controllers\UsersCT;
 use Illuminate\Support\Facades\Route;
+
 
 
 Route::get('/login', [LoginCT::class, 'index'])->name('login');
@@ -20,6 +22,7 @@ Route::middleware(['auth','revalidate'])->group(function(){
     Route::get('/setting', [UsersCT::class, 'setting']);
 });
 
+Route::get('/test/api', [GuestCT::class, 'index']);
 
 Route::get('/', function () {
     return view('pages.dashboard');

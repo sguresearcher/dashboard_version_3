@@ -25,10 +25,7 @@
     <!-- BEGIN brand -->
     <div class="brand">
         <a href="#" class="brand-logo">
-            <span class="brand-img">
-                <span class="brand-img-text text-theme"></span>
-            </span>
-            <span class="brand-text">Dashboard ISIF</span>
+            <img src="{{ asset('assets/img/logo.png') }}" alt="">
         </a>
     </div>
     <!-- END brand -->
