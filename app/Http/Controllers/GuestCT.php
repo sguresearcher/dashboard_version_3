@@ -13,6 +13,8 @@ class GuestCT extends Controller
 
         if ($response->successful()) {
             $data = $response->json();
+
+            return $data;
         } else {
             return response()->json(['error'=>'failed to fetch data!']);
         }
