@@ -48,11 +48,11 @@
                     <span class="flex-grow-1">Total Attack</span>
                 </div>
                 <div class="mb-3">
-                   <h2>2,000,000</h2>
+                   <h2 id="totalAttack">Loading....</h2>
                 </div>
 
                 <div class="d-flex fw-bold small mb-3">
-                    <span class="flex-grow-1">Average per day</span>
+                    <span class="flex-grow-1">Last 24 Hours</span>
                 </div>
                 <div class="mb-3">
                    <h2>300,000</h2>
@@ -117,3 +117,31 @@
     </div>
 </div>
 @endsection
+@push('js')
+
+<script>
+    function fetchAttackData() {
+        $.ajax({
+            url: '/data/sum-conpot',
+            method: 'GET',
+            success: function(response) {
+                if (response.total_attack !== undefined) {
+                    $('#totalAttack').text(response.total_attack.toLocaleString());
+                } else {
+                    $('#totalAttack').text('No data');
+                }
+            },
+            error: function() {
+                $('#totalAttack').text('Failed to load');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        fetchAttackData();
+
+        // Set interval setiap 5 jam(millisecond)
+        setInterval(fetchAttackData, 18000000);
+    });
+</script>
+@endpush

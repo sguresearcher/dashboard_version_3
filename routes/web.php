@@ -22,7 +22,7 @@ Route::middleware(['auth','revalidate'])->group(function(){
     Route::get('/setting', [UsersCT::class, 'setting']);
 });
 
-Route::get('/test/api', [GuestCT::class, 'index']);
+Route::get('/data/sum-conpot', [GuestCT::class, 'index']);
 
 Route::get('/', function () {
     return view('pages.dashboard');
