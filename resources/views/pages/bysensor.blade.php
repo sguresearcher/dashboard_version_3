@@ -122,7 +122,7 @@
 <script>
     function fetchAttackData() {
         $.ajax({
-            url: '/data/sum-conpot',
+            url: '/data/{{ $sensor }}/h',
             method: 'GET',
             success: function(response) {
                 if (response.total_attack !== undefined) {
