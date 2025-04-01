@@ -105,7 +105,7 @@
         <div class="card">
             <div class="card-body">
                 <h6 class="mb-4">Top 10 Attacker IP</h6>
-                <canvas id="barChart"></canvas>
+                <canvas id="top10IpTenant"></canvas>
             </div>
             <div class="card-arrow">
                 <div class="card-arrow-top-left"></div>
@@ -144,4 +144,67 @@
         setInterval(fetchAttackData, 18000000);
     });
 </script>
+
+
+<script>
+    function fetchDataAndUpdateChart() {
+        fetch('/data/{{ $sensor }}/top-10-ip')
+            .then(response => response.json())
+            .then(result => {
+                const data = result.data;
+                const labels = Object.keys(data); // IP addresses
+                const values = Object.values(data); // totalAttack
+
+                if (window.barChart) {
+                    // Update chart data
+                    window.barChart.data.labels = labels;
+                    window.barChart.data.datasets[0].data = values;
+                    window.barChart.update();
+                } else {
+                    // Initialize chart if it doesn't exist
+                    const ctx2 = document.getElementById('top10IpTenant').getContext('2d');
+                    window.barChart = new Chart(ctx2, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Jumlah Serangan per IP',
+                                data: values,
+                                backgroundColor: 'rgba(100, 149, 237, 0.25)',
+                                borderColor: 'rgba(100, 149, 237, 1)',
+                                borderWidth: 1.5
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Total Attack'
+                                    }
+                                },
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'IP Address'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Fetch data immediately on page load
+    fetchDataAndUpdateChart();
+
+    // Set interval to update chart every 1 minute (60,000 ms)
+    setInterval(fetchDataAndUpdateChart, 60000);
+</script>
+
+
 @endpush

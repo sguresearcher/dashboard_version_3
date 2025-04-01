@@ -16,6 +16,22 @@
 	
 	<!-- ================== BEGIN page-css ================== -->
 	<link href="{{ asset('assets/plugins/jvectormap-next/jquery-jvectormap.css') }}" rel="stylesheet">
+	<style>
+		.highlight-row {
+			background-color: rgba(255, 223, 0, 0.5);  /* Highlight color */
+			animation: highlightAnim 3s ease-out;      /* Animasi selama 3 detik */
+		}
+
+		@keyframes highlightAnim {
+			0% {
+				background-color: rgba(255, 223, 0, 0.5);
+			}
+			100% {
+				background-color: transparent;
+			}
+}
+	</style>
+
 	<!-- ================== END page-css ================== -->
 </head>
 <body>

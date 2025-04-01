@@ -50,14 +50,8 @@ var handleRenderChartJs = function() {
 	barChart = new Chart(ctx2, {
 		type: 'bar',
 		data: {
-			labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+			labels: ['192.168.100.121','192.168.100.121','192.168.100.121','192.168.100.121','192.168.100.121','192.168.100.121'],
 			datasets: [{
-				label: 'Total Visitors',
-				data: [37,31,36,34,43,31],
-				backgroundColor: 'rgba('+ app.color.themeRgb +', .25)',
-				borderColor: app.color.theme,
-				borderWidth: 1.5
-			},{
 				label: 'New Visitors',
 				data: [12,16,20,14,23,21],
 				backgroundColor: 'rgba('+ app.color.secondaryRgb +', .25)',
