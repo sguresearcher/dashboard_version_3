@@ -18,7 +18,8 @@ class UserSeeder extends Seeder
             'name' => 'superadmin',
             'email' => 'duta.nugraha82@gmail.com',
             'password' => Hash::make('123456'),
-            'role' => 'superadmin'
+            'role' => 'superadmin',
+            'user_code' => 'superadmin'
         ]);
     }
 }

@@ -3,14 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class getDataTenantCT extends Controller
 {
+    private $username;
+    private $password;
+
+    public function __construct()
+    {
+        $this->username = env('API_USERNAME_SECRETO'); 
+        $this->password = env('API_PASSWORD_SECRETO');
+    }
     public function totalAttack($sensor){
         // $response = Http::get("http://10.20.100.172:7777/data/telkom/conpot/24h");
-        $response = Http::withBasicAuth('S6ur3searcher!#', 'pleasechangeme123')->get("http://10.20.100.172:7777/data/hp_usk_1/". $sensor ."/24h");
+        $response = Http::withBasicAuth($this->username, $this->password)->get("http://10.20.100.172:7777/data/". Auth::user()->user_code ."/". $sensor ."/24h");
 
         if ($response->successful()) {
             $data = $response->json();
@@ -25,7 +34,7 @@ class getDataTenantCT extends Controller
     }
 
     public function top10AttackerIp($sensor){
-        $response = Http::withBasicAuth('S6ur3searcher!#', 'pleasechangeme123')->get("http://10.20.100.172:7777/data/hp_usk_1/". $sensor ."/24h");
+        $response = Http::withBasicAuth($this->username, $this->password)->get("http://10.20.100.172:7777/data/". Auth::user()->user_code ."/". $sensor ."/24h");
 
         if ($response->successful()) {
             $data = $response->json();
@@ -42,7 +51,7 @@ class getDataTenantCT extends Controller
     }
 
     public function total($sensor){
-        $response = Http::withBasicAuth('S6ur3searcher!#', 'pleasechangeme123')->get("http://10.20.100.172:7777/data/hp_usk_1/". $sensor ."");
+        $response = Http::withBasicAuth($this->username, $this->password)->get("http://10.20.100.172:7777/data/". Auth::user()->user_code ."/". $sensor ."");
 
         if ($response->successful()) {
 
@@ -70,7 +79,7 @@ class getDataTenantCT extends Controller
         //         ->get('http://10.20.100.172:7777/data/all/30d');
 
         $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . base64_encode('S6ur3searcher!#:pleasechangeme123')
+            'Authorization' => 'Basic ' . base64_encode(''.$this->username.':'.$this->password.'')
         ])
         ->get('http://10.20.100.172:7777/data/all/24h');
 
@@ -93,7 +102,7 @@ class getDataTenantCT extends Controller
     public function getDataTop10Table(){
 
             $response = Http::withHeaders([
-                'Authorization' => 'Basic ' . base64_encode('S6ur3searcher!#:pleasechangeme123')
+                'Authorization' => 'Basic ' . base64_encode(''.$this->username.':'.$this->password.'')
             ])->get('http://10.20.100.172:7777/data/all/24h');
 
             if ($response->successful()) {
@@ -128,7 +137,7 @@ class getDataTenantCT extends Controller
     public function getSensorAttackCount(){
 
         $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . base64_encode('S6ur3searcher!#:pleasechangeme123')
+            'Authorization' => 'Basic ' . base64_encode(''.$this->username.':'.$this->password.'')
         ])->get('http://10.20.100.172:7777/data/all/24h');
 
         if ($response->successful()) {
