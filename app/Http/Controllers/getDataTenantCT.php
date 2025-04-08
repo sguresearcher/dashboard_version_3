@@ -21,9 +21,9 @@ class getDataTenantCT extends Controller
         // $response = Http::get("http://10.20.100.172:7777/data/telkom/conpot/24h");
         $response = Http::withBasicAuth($this->username, $this->password)->get("http://10.20.100.172:7777/data/". Auth::user()->user_code ."/". $sensor ."/24h");
 
+ 
         if ($response->successful()) {
             $data = $response->json();
-
             return response()->json([
                 'total_attack' => count($data)
             ]);
@@ -41,7 +41,7 @@ class getDataTenantCT extends Controller
             
             $topIpAttacker = collect($data)->pluck('src_ip')->countBy()->sortDesc()->take(10); //change 5 to other value you want
 
-
+           
             return response()->json([
                 'data' => $topIpAttacker
             ]);
@@ -153,6 +153,41 @@ class getDataTenantCT extends Controller
                 ->sortByDesc('count')
                 ->take(10)
                 ->values(); 
+
+            return response()->json([
+                'sensor_attack' => [
+                    'data' => $sensorCounts
+                ]
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Failed to fetch data!'
+            ], 404);
+        }
+    }
+
+    public function getSensorAverageAttackCount(){
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . base64_encode(''.$this->username.':'.$this->password.'')
+        ])->get('http://10.20.100.172:7777/data/all/24h');
+
+        if ($response->successful()) {
+            $data = collect($response->json()['data'] ?? []);
+
+            $sensorCounts = $data->groupBy('eventid')
+                ->map(function ($items, $sensor) {
+                    $total = $items->count();
+                    $average = round($total / 24, 2); // dibulatkan 2 angka desimal
+
+                    return [
+                        'sensor' => $sensor ?? 'Unknown',
+                        'total' => $total,
+                        'average_per_hour' => $average
+                    ];
+                })
+                ->sortByDesc('total')
+                ->take(10)
+                ->values();
 
             return response()->json([
                 'sensor_attack' => [

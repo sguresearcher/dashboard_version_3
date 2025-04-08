@@ -46,20 +46,20 @@ var handleRenderChartJs = function() {
 		}
 	});
 	
-	var ctx2 = document.getElementById('barChart');
-	barChart = new Chart(ctx2, {
-		type: 'bar',
-		data: {
-			labels: ['192.168.100.121','192.168.100.121','192.168.100.121','192.168.100.121','192.168.100.121','192.168.100.121'],
-			datasets: [{
-				label: 'New Visitors',
-				data: [12,16,20,14,23,21],
-				backgroundColor: 'rgba('+ app.color.secondaryRgb +', .25)',
-				borderColor: app.color.secondary,
-				borderWidth: 1.5
-			}]
-		}
-	});
+	// var ctx2 = document.getElementById('barChart');
+	// barChart = new Chart(ctx2, {
+	// 	type: 'bar',
+	// 	data: {
+	// 		labels: ['192.168.100.121','192.168.100.121','192.168.100.121','192.168.100.121','192.168.100.121','192.168.100.121'],
+	// 		datasets: [{
+	// 			label: 'New Visitors',
+	// 			data: [12,16,20,14,23,21],
+	// 			backgroundColor: 'rgba('+ app.color.secondaryRgb +', .25)',
+	// 			borderColor: app.color.secondary,
+	// 			borderWidth: 1.5
+	// 		}]
+	// 	}
+	// });
 	
 	var ctx3 = document.getElementById('radarChart');
 	radarChart = new Chart(ctx3, {

@@ -55,7 +55,7 @@
                     <span class="flex-grow-1">Last 24 Hours</span>
                 </div>
                 <div class="mb-3">
-                   <h2>300,000</h2>
+                   <div id="totalAttackAverage"></div>
                 </div>
             </div>
             <!-- END card-body -->
@@ -147,64 +147,105 @@
 
 
 <script>
-    function fetchDataAndUpdateChart() {
-        fetch('/data/{{ $sensor }}/top-10-ip')
-            .then(response => response.json())
-            .then(result => {
-                const data = result.data;
-                const labels = Object.keys(data); // IP addresses
-                const values = Object.values(data); // totalAttack
+    window.addEventListener('DOMContentLoaded', function () {
+        function fetchDataAndUpdateChart() {
+            fetch('/data/{{ $sensor }}/top-10-ip')
+                .then(response => response.json())
+                .then(result => {
+                    console.log("Hasil fetch:", result);
+                    const data = result.data;
 
-                if (window.barChart) {
-                    // Update chart data
-                    window.barChart.data.labels = labels;
-                    window.barChart.data.datasets[0].data = values;
-                    window.barChart.update();
-                } else {
-                    // Initialize chart if it doesn't exist
-                    const ctx2 = document.getElementById('top10IpTenant').getContext('2d');
-                    window.barChart = new Chart(ctx2, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Jumlah Serangan per IP',
-                                data: values,
-                                backgroundColor: 'rgba(100, 149, 237, 0.25)',
-                                borderColor: 'rgba(100, 149, 237, 1)',
-                                borderWidth: 1.5
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    title: {
-                                        display: true,
-                                        text: 'Total Attack'
-                                    }
-                                },
-                                x: {
-                                    title: {
-                                        display: true,
-                                        text: 'IP Address'
+                    if (!data) {
+                        console.warn("Data kosong atau tidak ditemukan:", result);
+                        return;
+                    }
+
+                    const labels = Object.keys(data);
+                    const values = Object.values(data);
+
+                    console.log("Labels:", labels);
+                    console.log("Values:", values);
+
+                    const canvas = document.getElementById('top10IpTenant');
+                    if (!canvas) {
+                        console.error("Canvas top10IpTenant tidak ditemukan di DOM!");
+                        return;
+                    }
+
+                    const ctx2 = canvas.getContext('2d');
+
+                    if (window.barChart) {
+                        window.barChart.data.labels = labels;
+                        window.barChart.data.datasets[0].data = values;
+                        window.barChart.update();
+                    } else {
+                        window.barChart = new Chart(ctx2, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Jumlah Serangan per IP',
+                                    data: values,
+                                    backgroundColor: 'rgba(100, 149, 237, 0.25)',
+                                    borderColor: 'rgba(100, 149, 237, 1)',
+                                    borderWidth: 1.5
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Total Attack'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'IP Address'
+                                        }
                                     }
                                 }
                             }
-                        }
-                    });
-                }
-            })
-            .catch(error => console.error('Error fetching data:', error));
-    }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
 
-    // Fetch data immediately on page load
-    fetchDataAndUpdateChart();
-
-    // Set interval to update chart every 1 minute (60,000 ms)
-    setInterval(fetchDataAndUpdateChart, 60000);
+        fetchDataAndUpdateChart();
+        setInterval(fetchDataAndUpdateChart, 60000);
+    });
 </script>
 
+<script>
+    function fetchAttackDataAverage() {
+        $.ajax({
+            url: '/data/{{ $sensor }}/h',
+            method: 'GET',
+            success: function(response) {
+                if (response.total_attack !== undefined) {
+                    $('#totalAttackAverage').text(response.total_attack.toLocaleString());
+                } else {
+                    $('#totalAttackAverage').text('No data');
+                }
+            },
+            error: function() {
+                $('#totalAttackAverage').text('Failed to load');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        fetchAttackDataAverage();
+
+        // Set interval setiap 5 jam(millisecond)
+        setInterval(fetchAttackData, 18000000);
+    });
+</script>
 
 @endpush

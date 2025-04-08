@@ -1,5 +1,6 @@
 @extends('master')
 @section('content')
+
 <div class="row">
     <!-- BEGIN col-6 -->
     <div class="col-xl-4">
@@ -20,7 +21,9 @@
                     <span class="flex-grow-1">Average per day</span>
                 </div>
                 <div class="mb-3">
-                   <h2>300,000</h2>
+                    <div class="mb-3">
+                        <div id="totalAttackAverage"></div>
+                     </div>
                 </div>
             </div>
             <!-- END card-body -->
@@ -88,7 +91,7 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-body">
-                <table id="top10IpAttacker" class="table text-nowrap w-100">
+                <table id="top10IpAttacker" class="table w-100">
                     <thead>
                             <th>No</th>
                             <th>Source Ip</th>
@@ -156,11 +159,11 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                             <td>${index + 1}.</td>
-                            <td>${item.source_address || '-'}</td>
-                            <td>${item.target_address || '-'}</td>
-                            <td>${item.eventid || '-'}</td>
-                            <td>${item.target_port || '-'}</td>
-                            <td>${item.total_attack || '-'}</td>
+                            <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${item.target_address || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${item.total_attack || '<span style="opacity:0.5">-</span>'}</td>
                     `;
                     tbody.appendChild(row);
 
@@ -183,42 +186,45 @@
 </script>
 
 <script>
-    function fetchTableDataAttackerSensor() {
-    fetch('/data/guest/get-attack-sensor')
-        .then(response => response.json())
-        .then(result => {
-            const tbody = document.querySelector('#attackSensor tbody');
-            tbody.innerHTML = ''; // Kosongkan isi tabel sebelum update
+    function fetchAttackDataAverage() {
+        $.ajax({
+            url: '/data/guest/get-attack-sensor-average',
+            method: 'GET',
+            success: function(response) {
+                const container = $('#totalAttackAverage');
+                container.empty(); // Bersihkan isi sebelumnya
 
-            const data = result.sensor_attack?.data || [];
+                const data = response.sensor_attack?.data || [];
 
-            data.forEach((item, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}.</td>
-                    <td>${item.sensor || 'unknown'}</td>
-                    <td>${item.count || '-'}</td>
-                `;
-                tbody.appendChild(row);
+                if (data.length > 0) {
+                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
 
-                if (index === 0) {
-                    row.classList.add('highlight-row');
-                    setTimeout(() => {
-                        row.classList.remove('highlight-row');
-                    }, 10000);
+                    data.forEach(item => {
+                        const sensorName = item.sensor || 'Unknown';
+                        const average = item.average_per_hour ?? 0;
+                        const li = $(`<li><strong>${sensorName}</strong>: ${average} / jam</li>`);
+                        ul.append(li);
+                    });
+
+                    container.append(ul);
+                } else {
+                    container.text('No data available');
                 }
-            });
-        })
-        .catch(error => console.error('Error fetching table data:', error));
-}
+            },
+            error: function() {
+                $('#totalAttackAverage').text('Failed to load');
+            }
+        });
+    }
 
-// Fetch data saat halaman pertama kali dimuat
-fetchTableDataAttackerSensor();
+    $(document).ready(function() {
+        fetchAttackDataAverage();
 
-// Perbarui data setiap 1 menit (60,000 ms)
-setInterval(fetchTableDataAttackerSensor, 60000);
-
+        // Update setiap 5 jam = 18000000 ms (tapi bisa kamu turunkan kalau buat debug cepat)
+        setInterval(fetchAttackDataAverage, 18000000);
+    });
 </script>
+
 
 
 @endpush

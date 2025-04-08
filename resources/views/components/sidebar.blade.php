@@ -79,6 +79,21 @@
                             <span class="menu-text">Cowrie</span>
                         </a>
                     </div>
+                    <div class="menu-item">
+                        <a href="/sensor/dionaea" class="menu-link">
+                            <span class="menu-text">Dionaea</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a href="/sensor/rdpy" class="menu-link">
+                            <span class="menu-text">Rdpy</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a href="/sensor/dionaea_ews" class="menu-link">
+                            <span class="menu-text">Dionaea Ews</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
