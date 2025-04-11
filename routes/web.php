@@ -28,6 +28,9 @@ Route::get('/data/{sensor}/top-10-ip', [getDataTenantCT::class, 'top10AttackerIp
 Route::get('/data/{sensor}/total', [getDataTenantCT::class, 'total']);
 Route::get('/data/guest/total-attack', [getDataTenantCT::class, 'totalAttackGuest']);
 Route::get('/data/guest/top-10', [getDataTenantCT::class, 'getDataTop10Table']);
+Route::get('/data/tenant/total-attack', [getDataTenantCT::class, 'totalAttackTenantDashboard']);
+Route::get('/data/tenant/top-10', [getDataTenantCT::class, 'getDataTop10TenantDashboard']);
+Route::get('/data/tenant/average', [getDataTenantCT::class, 'getDataAverageTenant']);
 Route::get('/data/guest/get-attack-sensor', [getDataTenantCT::class, 'getSensorAttackCount']);
 Route::get('/data/guest/get-attack-sensor-average', [getDataTenantCT::class, 'getSensorAverageAttackCount']);
 

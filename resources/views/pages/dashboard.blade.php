@@ -118,10 +118,53 @@
 </div>
 @endsection
 @push('js')
+
+@if (auth()->user()->role == 'tenant')
+<script>
+    function fetchTableData() {
+        fetch('/data/tenant/top-10')
+            .then(response => response.json())
+            .then(result => {
+                const tbody = document.querySelector('#top10IpAttacker tbody');
+                tbody.innerHTML = ''; // Kosongkan isi tabel sebelum update
+
+                // Pastikan result.total_attack.data ada dan berbentuk array
+                const data = result.total_attack?.data || [];
+
+                data.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                            <td>${index + 1}.</td>
+                            <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${item.target_address || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${item.total_attack || '<span style="opacity:0.5">-</span>'}</td>
+                    `;
+                    tbody.appendChild(row);
+
+                    if (index === 0) {
+                        row.classList.add('highlight-row');
+                        setTimeout(() => {
+                            row.classList.remove('highlight-row');
+                        }, 10000);
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching table data:', error));
+    }
+
+    // Fetch data saat halaman pertama kali dimuat
+    fetchTableData();
+
+    // Perbarui data setiap 1 menit (60,000 ms)
+    setInterval(fetchTableData, 60000);
+</script>
+
 <script>
     function fetchAttackData() {
         $.ajax({
-            url: '/data/guest/total-attack',
+            url: '/data/tenant/total-attack',
             method: 'GET',
             success: function(response) {
                 if (response.total_attack !== undefined) {
@@ -144,6 +187,48 @@
     });
 </script>
 
+<script>
+    function fetchAttackDataAverage() {
+        $.ajax({
+            url: '/data/tenant/average',
+            method: 'GET',
+            success: function(response) {
+                const container = $('#totalAttackAverage');
+                container.empty(); // Bersihkan isi sebelumnya
+
+                const data = response.sensor_attack?.data || [];
+
+                if (data.length > 0) {
+                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+
+                    data.forEach(item => {
+                        const sensorName = item.sensor || 'Unknown';
+                        const average = item.average_per_hour ?? 0;
+                        const li = $(`<li><strong>${sensorName}</strong>: ${average} / jam</li>`);
+                        ul.append(li);
+                    });
+
+                    container.append(ul);
+                } else {
+                    container.text('No data available');
+                }
+            },
+            error: function() {
+                $('#totalAttackAverage').text('Failed to load');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        fetchAttackDataAverage();
+
+        // Update setiap 5 jam = 18000000 ms (tapi bisa kamu turunkan kalau buat debug cepat)
+        setInterval(fetchAttackDataAverage, 18000000);
+    });
+</script>
+
+
+@else
 <script>
     function fetchTableData() {
         fetch('/data/guest/top-10')
@@ -186,6 +271,32 @@
 </script>
 
 <script>
+    function fetchAttackData() {
+        $.ajax({
+            url: '/data/guest/total-attack',
+            method: 'GET',
+            success: function(response) {
+                if (response.total_attack !== undefined) {
+                    $('#totalAttack').text(response.total_attack.toLocaleString());
+                } else {
+                    $('#totalAttack').text('No data');
+                }
+            },
+            error: function() {
+                $('#totalAttack').text('Failed to load');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        fetchAttackData();
+
+        // Set interval setiap 5 jam(millisecond)
+        setInterval(fetchAttackData, 18000000);
+    });
+</script>
+
+<script>
     function fetchAttackDataAverage() {
         $.ajax({
             url: '/data/guest/get-attack-sensor-average',
@@ -224,7 +335,5 @@
         setInterval(fetchAttackDataAverage, 18000000);
     });
 </script>
-
-
-
+@endif
 @endpush
