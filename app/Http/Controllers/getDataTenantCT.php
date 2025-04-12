@@ -80,7 +80,7 @@ class getDataTenantCT extends Controller
 
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . base64_encode(''.$this->username.':'.$this->password.'')
-        ])->timeout(60)->get('http://10.20.100.172:7777/data/all/24h');
+        ])->timeout(180)->get('http://10.20.100.172:7777/data/all/24h');
 
         if ($response->successful()) {
             
@@ -102,7 +102,7 @@ class getDataTenantCT extends Controller
 
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . base64_encode(''.$this->username.':'.$this->password.'')
-            ])->timeout(60)->get('http://10.20.100.172:7777/data/all/24h');
+            ])->timeout(180)->get('http://10.20.100.172:7777/data/all/24h');
 
             if ($response->successful()) {
                 $data = collect($response->json()['data'] ?? []);
@@ -137,7 +137,7 @@ class getDataTenantCT extends Controller
 
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . base64_encode(''.$this->username.':'.$this->password.'')
-        ])->timeout(60)->get('http://10.20.100.172:7777/data/all/24h');
+        ])->timeout(180)->get('http://10.20.100.172:7777/data/all/24h');
 
         if ($response->successful()) {
             $data = collect($response->json()['data'] ?? []);
@@ -168,7 +168,7 @@ class getDataTenantCT extends Controller
     public function getSensorAverageAttackCount(){
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . base64_encode(''.$this->username.':'.$this->password.'')
-        ])->timeout(60)->get('http://10.20.100.172:7777/data/all/24h');
+        ])->timeout(180)->get('http://10.20.100.172:7777/data/all/24h');
 
         if ($response->successful()) {
             $data = collect($response->json()['data'] ?? []);
@@ -203,7 +203,7 @@ class getDataTenantCT extends Controller
     public function totalAttackTenantDashboard(){
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . base64_encode(''.$this->username.':'.$this->password.'')
-        ])->timeout(60)->get('http://10.20.100.172:7777/data/'. Auth::user()->user_code .'/merged/24h');
+        ])->timeout(180)->get('http://10.20.100.172:7777/data/'. Auth::user()->user_code .'/merged/24h');
 
         if ($response->successful()) {
             $data = $response->json();
@@ -220,7 +220,7 @@ class getDataTenantCT extends Controller
     public function getDataTop10TenantDashboard(){
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . base64_encode(''.$this->username.':'.$this->password.'')
-        ])->timeout(60)->get('http://10.20.100.172:7777/data/'. Auth::user()->user_code .'/merged/24h');
+        ])->timeout(180)->get('http://10.20.100.172:7777/data/'. Auth::user()->user_code .'/merged/24h');
 
         if ($response->successful()) {
             $data = collect($response->json()['data'] ?? []);
@@ -254,7 +254,7 @@ class getDataTenantCT extends Controller
     public function getDataAverageTenant(){
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . base64_encode(''.$this->username.':'.$this->password.'')
-        ])->timeout(60)->get('http://10.20.100.172:7777/data/'. Auth::user()->user_code .'/merged/24h');
+        ])->timeout(180)->get('http://10.20.100.172:7777/data/'. Auth::user()->user_code .'/merged/24h');
 
         if ($response->successful()) {
             $data = collect($response->json()['data'] ?? []);
