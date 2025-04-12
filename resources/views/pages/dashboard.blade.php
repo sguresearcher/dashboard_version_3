@@ -119,7 +119,7 @@
 @endsection
 @push('js')
 
-@if (auth()->user()->role == 'tenant')
+@auth
 <script>
     function fetchTableData() {
         fetch('/data/tenant/top-10')
@@ -227,8 +227,9 @@
     });
 </script>
 
+@endauth
 
-@else
+@guest
 <script>
     function fetchTableData() {
         fetch('/data/guest/top-10')
@@ -335,5 +336,6 @@
         setInterval(fetchAttackDataAverage, 18000000);
     });
 </script>
-@endif
+
+@endguest
 @endpush
