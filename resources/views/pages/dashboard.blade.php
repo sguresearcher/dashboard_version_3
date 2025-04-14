@@ -94,9 +94,9 @@
                 <table id="top10IpAttacker" class="table w-100">
                     <thead>
                             <th>No</th>
-                            <th>Source Ip</th>
+                            <th>Attack IP</th>
                             <th>Destination Ip</th>
-                            <th>Sensor</th>
+                            <th>Protocol</th>
                             <th>Port</th>
                             <th>Total</th>
                     </thead>
@@ -126,9 +126,8 @@
             .then(response => response.json())
             .then(result => {
                 const tbody = document.querySelector('#top10IpAttacker tbody');
-                tbody.innerHTML = ''; // Kosongkan isi tabel sebelum update
+                tbody.innerHTML = '';
 
-                // Pastikan result.total_attack.data ada dan berbentuk array
                 const data = result.total_attack?.data || [];
 
                 data.forEach((item, index) => {
@@ -154,10 +153,8 @@
             .catch(error => console.error('Error fetching table data:', error));
     }
 
-    // Fetch data saat halaman pertama kali dimuat
     fetchTableData();
 
-    // Perbarui data setiap 1 menit (60,000 ms)
     setInterval(fetchTableData, 60000);
 </script>
 
@@ -182,7 +179,6 @@
     $(document).ready(function() {
         fetchAttackData();
 
-        // Set interval setiap 5 jam(millisecond)
         setInterval(fetchAttackData, 18000000);
     });
 </script>
@@ -194,7 +190,7 @@
             method: 'GET',
             success: function(response) {
                 const container = $('#totalAttackAverage');
-                container.empty(); // Bersihkan isi sebelumnya
+                container.empty(); 
 
                 const data = response.sensor_attack?.data || [];
 
@@ -222,7 +218,6 @@
     $(document).ready(function() {
         fetchAttackDataAverage();
 
-        // Update setiap 5 jam = 18000000 ms (tapi bisa kamu turunkan kalau buat debug cepat)
         setInterval(fetchAttackDataAverage, 18000000);
     });
 </script>
@@ -236,9 +231,8 @@
             .then(response => response.json())
             .then(result => {
                 const tbody = document.querySelector('#top10IpAttacker tbody');
-                tbody.innerHTML = ''; // Kosongkan isi tabel sebelum update
+                tbody.innerHTML = '';
 
-                // Pastikan result.total_attack.data ada dan berbentuk array
                 const data = result.total_attack?.data || [];
 
                 data.forEach((item, index) => {
@@ -264,10 +258,8 @@
             .catch(error => console.error('Error fetching table data:', error));
     }
 
-    // Fetch data saat halaman pertama kali dimuat
     fetchTableData();
 
-    // Perbarui data setiap 1 menit (60,000 ms)
     setInterval(fetchTableData, 60000);
 </script>
 
@@ -292,7 +284,6 @@
     $(document).ready(function() {
         fetchAttackData();
 
-        // Set interval setiap 5 jam(millisecond)
         setInterval(fetchAttackData, 18000000);
     });
 </script>
@@ -304,7 +295,7 @@
             method: 'GET',
             success: function(response) {
                 const container = $('#totalAttackAverage');
-                container.empty(); // Bersihkan isi sebelumnya
+                container.empty();
 
                 const data = response.sensor_attack?.data || [];
 
@@ -332,10 +323,48 @@
     $(document).ready(function() {
         fetchAttackDataAverage();
 
-        // Update setiap 5 jam = 18000000 ms (tapi bisa kamu turunkan kalau buat debug cepat)
         setInterval(fetchAttackDataAverage, 18000000);
     });
 </script>
+
+<script>
+    function fetchSensorAttackCount() {
+        $.ajax({
+            url: '/data/guest/get-attack-sensor-count',
+            method: 'GET',
+            success: function(response) {
+                const tbody = $('#attackSensor tbody');
+                tbody.empty();
+
+                const data = response.sensor_attack?.data || [];
+
+                if (data.length > 0) {
+                    data.forEach((item, index) => {
+                        const row = `
+                            <tr>
+                                <td>${index + 1}.</td>
+                                <td>${item.sensor || '-'}</td>
+                                <td>${item.count || 0}</td>
+                            </tr>
+                        `;
+                        tbody.append(row);
+                    });
+                } else {
+                    tbody.append('<tr><td colspan="3" class="text-center">No data available</td></tr>');
+                }
+            },
+            error: function() {
+                console.error('Failed to fetch sensor count data');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        fetchSensorAttackCount();
+        setInterval(fetchSensorAttackCount, 18000000); 
+    });
+</script>
+
 
 @endguest
 @endpush

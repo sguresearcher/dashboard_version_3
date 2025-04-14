@@ -8,7 +8,6 @@ use App\Http\Controllers\UsersCT;
 use Illuminate\Support\Facades\Route;
 
 
-
 Route::get('/login', [LoginCT::class, 'index'])->name('login');
 Route::post('/login', [LoginCT::class, 'auth']);
 Route::post('/logout', [LoginCT::class, 'logout']);
@@ -33,8 +32,9 @@ Route::get('/data/tenant/top-10', [getDataTenantCT::class, 'getDataTop10TenantDa
 Route::get('/data/tenant/average', [getDataTenantCT::class, 'getDataAverageTenant']);
 Route::get('/data/guest/get-attack-sensor', [getDataTenantCT::class, 'getSensorAttackCount']);
 Route::get('/data/guest/get-attack-sensor-average', [getDataTenantCT::class, 'getSensorAverageAttackCount']);
-
+Route::get('/data/guest/get-attack-sensor-count', [getDataTenantCT::class, 'getSensorAttackCount']);
 
 Route::get('/', function () {
     return view('pages.dashboard');
 });
+
