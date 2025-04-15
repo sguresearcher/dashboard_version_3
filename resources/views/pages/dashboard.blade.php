@@ -6,7 +6,7 @@
     <div class="col-xl-4">
         <h4>Summary Per Day</h4>
         <!-- BEGIN card -->
-        <div class="card mb-3">
+        <div class="card border-0 mb-3">
             <!-- BEGIN card-body -->
             <div class="card-body">
                 <!-- BEGIN title -->
@@ -26,16 +26,6 @@
                      </div>
                 </div>
             </div>
-            <!-- END card-body -->
-            
-            <!-- BEGIN card-arrow -->
-            <div class="card-arrow">
-                <div class="card-arrow-top-left"></div>
-                <div class="card-arrow-top-right"></div>
-                <div class="card-arrow-bottom-left"></div>
-                <div class="card-arrow-bottom-right"></div>
-            </div>
-            <!-- END card-arrow -->
         </div>
         <!-- END card -->
     </div>
@@ -46,15 +36,9 @@
         <!-- BEGIN card -->
         <div id="jVectorMap" class="mb-5">
             <h4>Threat Map</h4>
-            <div class="card">
+            <div class="card border-0">
                 <div class="card-body">
                     <div id="jvectorMap" style="height: 300px;"></div>
-                </div>
-                <div class="card-arrow">
-                    <div class="card-arrow-top-left"></div>
-                    <div class="card-arrow-top-right"></div>
-                    <div class="card-arrow-bottom-left"></div>
-                    <div class="card-arrow-bottom-right"></div>
                 </div>
             </div>
         </div>
@@ -63,9 +47,9 @@
 </div>
 <div class="row">
     <div class="col-md-6 mb-4 mb-md-0">
-        <div class="card">
-            <div class="card-body">
-                <table id="attackSensor" class="table text-nowrap w-100">
+        <div class="card border-0">
+            <div class="card-body table-scroll">
+                <table id="attackSensor" class="table w-100">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -77,20 +61,11 @@
                     </tbody>
                 </table>
             </div>
-            <div class="card-arrow">
-                <div class="card-arrow-top-left"></div>
-                <div class="card-arrow-top-right"></div>
-                <div class="card-arrow-bottom-left"></div>
-                <div class="card-arrow-bottom-right"></div>
-            </div>
-            {{-- <div class="hljs-container">
-                <pre><code class="xml" data-url="assets/data/table-plugins/code-1.json"></code></pre>
-            </div> --}}
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-body">
+        <div class="card border-0">
+            <div class="card-body table-scroll">
                 <table id="top10IpAttacker" class="table w-100">
                     <thead>
                             <th>No</th>
@@ -104,15 +79,6 @@
                     </tbody>
                 </table>
             </div>
-            <div class="card-arrow">
-                <div class="card-arrow-top-left"></div>
-                <div class="card-arrow-top-right"></div>
-                <div class="card-arrow-bottom-left"></div>
-                <div class="card-arrow-bottom-right"></div>
-            </div>
-            {{-- <div class="hljs-container">
-                <pre><code class="xml" data-url="assets/data/table-plugins/code-1.json"></code></pre>
-            </div> --}}
         </div>
     </div>
 </div>

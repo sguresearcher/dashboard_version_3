@@ -30,7 +30,14 @@
 			100% {
 				background-color: transparent;
 			}
-}
+		}
+
+		.table-scroll {
+						max-height: 300px; /* atur tinggi sesuai kebutuhan */
+						overflow-y: auto;
+						overflow-x: auto;
+						white-space: nowrap;
+						}
 	</style>
 
 	<!-- ================== END page-css ================== -->
