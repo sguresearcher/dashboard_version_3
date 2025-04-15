@@ -33,10 +33,17 @@
 		}
 
 		.table-scroll {
-						max-height: 300px; /* atur tinggi sesuai kebutuhan */
+						max-height: 200px; /* atur tinggi sesuai kebutuhan */
 						overflow-y: auto;
 						overflow-x: auto;
 						white-space: nowrap;
+						}
+						
+		.table-scroll thead th {
+						position: sticky;
+						top: 0;
+						z-index: 1;
+						background-color: #0c1c2c; /* atau sesuaikan dengan warna card kamu */
 						}
 	</style>
 
