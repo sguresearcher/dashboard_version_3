@@ -124,7 +124,7 @@
     }
 
     function fetchTop10AttackerChart() {
-        fetch('/data/tenant/sensor/{{ $sensor }}/detail')
+        fetch('/data/tenant/sensor/{{ $sensor }}/top10')
             .then(response => response.json())
             .then(result => {
                 const data = result.data;

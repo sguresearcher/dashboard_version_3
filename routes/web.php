@@ -36,6 +36,7 @@ Route::get('/data/guest/get-attack-sensor-count', [getDataTenantCT::class, 'getS
 Route::get('/data/tenant/get-attack-sensor-count', [getDataTenantCT::class, 'getSensorAttackCountTenant']);
 
 Route::get('/data/tenant/sensor/{sensor}/detail', [getDataTenantCT::class, 'getAttackCountBySensorName']);
+Route::get('/data/tenant/sensor/{sensor}/top10', [getDataTenantCT::class, 'getTop10AttackersBySensor']);
 
 
 Route::get('/', function () {

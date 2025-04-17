@@ -212,50 +212,75 @@ class getDataTenantCT extends Controller
     }
 
     public function getAttackCountBySensorName($sensor)
-{
-    $response = Http::withBasicAuth($this->username, $this->password)
-        ->get("http://10.20.100.172:7777/data/" . Auth::user()->user_code . "/" . $sensor . "/24h");
+    {
+        $response = Http::withBasicAuth($this->username, $this->password)
+            ->get("http://10.20.100.172:7777/data/" . Auth::user()->user_code . "/" . $sensor . "/24h");
 
-    if ($response->successful()) {
-        $rawData = $response->json();
+        if ($response->successful()) {
+            $rawData = $response->json();
 
-        // Kalau datanya nested dalam "data": [...]
-        $data = collect($rawData['data'] ?? $rawData);
+            // Kalau datanya nested dalam "data": [...]
+            $data = collect($rawData['data'] ?? $rawData);
 
-        // Filter hanya entry yang punya src_ip valid
-        $filtered = $data->filter(function ($item) {
-            return isset($item['src_ip']) && !empty($item['src_ip']);
-        });
+            // Filter hanya entry yang punya src_ip valid
+            $filtered = $data->filter(function ($item) {
+                return isset($item['src_ip']) && !empty($item['src_ip']);
+            });
 
-        // Group by IP dan hitung jumlah serangan
-        $grouped = $filtered->groupBy('src_ip')->map(function ($entries, $ip) {
-            return [
-                'source_address' => $ip,
-                'count' => $entries->count(),
-                'total' => $entries->count() // kamu bisa modifikasi ini pakai where()
-            ];
-        })->sortByDesc('total')->values();
+            // Group by IP dan hitung jumlah serangan
+            $grouped = $filtered->groupBy('src_ip')->map(function ($entries, $ip) {
+                return [
+                    'source_address' => $ip,
+                    'count' => $entries->count(),
+                    'total' => $entries->count() // kamu bisa modifikasi ini pakai where()
+                ];
+            })->sortByDesc('total')->values();
+
+            return response()->json([
+                'sensor' => $sensor,
+                'data' => $grouped
+            ]);
+        }
 
         return response()->json([
             'sensor' => $sensor,
-            'data' => $grouped
-        ]);
+            'data' => []
+        ], 404);
     }
 
-    return response()->json([
-        'sensor' => $sensor,
-        'data' => []
-    ], 404);
-}
+    public function getTop10AttackersBySensor($sensor)
+    {
+        $response = Http::withBasicAuth($this->username, $this->password)
+            ->get("http://10.20.100.172:7777/data/" . Auth::user()->user_code . "/" . $sensor . "/24h");
 
-    
+        if ($response->successful()) {
+            $rawData = $response->json();
+
+            $data = collect($rawData['data'] ?? $rawData);
+
+            $filtered = $data->filter(fn ($item) => isset($item['src_ip']) && !empty($item['src_ip']));
+
+            $grouped = $filtered->groupBy('src_ip')->map(function ($entries, $ip) {
+                return [
+                    'source_address' => $ip,
+                    'count' => $entries->count(),
+                    'total' => $entries->count()
+                ];
+            })->sortByDesc('total')->take(10)->values();
+
+            return response()->json([
+                'sensor' => $sensor,
+                'data' => $grouped
+            ]);
+        }
+
+        return response()->json([
+            'sensor' => $sensor,
+            'data' => []
+        ], 404);
+    }
 
 
-
-
-    
-    
-    
 
     public function totalAttackTenantDashboard(){
         $response = Http::withHeaders([
