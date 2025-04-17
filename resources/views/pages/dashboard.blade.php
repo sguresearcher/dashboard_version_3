@@ -86,6 +86,46 @@
 @push('js')
 
 @auth
+
+<script>
+    function fetchSensorAttackCountTenant() {
+        $.ajax({
+            url: '/data/tenant/get-attack-sensor-count',
+            method: 'GET',
+            success: function(response) {
+                const tbody = $('#attackSensor tbody');
+                tbody.empty();
+
+                const data = response.sensor_attack?.data || [];
+
+                if (data.length > 0) {
+                    data.forEach((item, index) => {
+                        const row = `
+                            <tr>
+                                <td>${index + 1}.</td>
+                                <td>${item.sensor || '-'}</td>
+                                <td>${item.count || 0}</td>
+                            </tr>
+                        `;
+                        tbody.append(row);
+                    });
+                } else {
+                    tbody.append('<tr><td colspan="3" class="text-center">No data available</td></tr>');
+                }
+            },
+            error: function() {
+                console.error('Failed to fetch sensor count data (tenant)');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        fetchSensorAttackCountTenant();
+        setInterval(fetchSensorAttackCountTenant, 18000000); 
+    });
+</script>
+
+
 <script>
     function fetchTableData() {
         fetch('/data/tenant/top-10')

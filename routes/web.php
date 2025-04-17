@@ -33,8 +33,14 @@ Route::get('/data/tenant/average', [getDataTenantCT::class, 'getDataAverageTenan
 Route::get('/data/guest/get-attack-sensor', [getDataTenantCT::class, 'getSensorAttackCount']);
 Route::get('/data/guest/get-attack-sensor-average', [getDataTenantCT::class, 'getSensorAverageAttackCount']);
 Route::get('/data/guest/get-attack-sensor-count', [getDataTenantCT::class, 'getSensorAttackCount']);
+Route::get('/data/tenant/get-attack-sensor-count', [getDataTenantCT::class, 'getSensorAttackCountTenant']);
+
+Route::get('/data/tenant/sensor/{sensor}/detail', [getDataTenantCT::class, 'getAttackCountBySensorName']);
+
 
 Route::get('/', function () {
     return view('pages.dashboard');
 });
+
+
 
