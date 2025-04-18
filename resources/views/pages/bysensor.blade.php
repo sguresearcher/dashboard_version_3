@@ -6,34 +6,8 @@
 
 <div class="row">
     <div class="col-md-6">
-        <div class="card mb-3">
-            <div class="card-body">
-                <div id="chartJsLineChart" class="mb-5">
-                    <div class="card">
-                        <div class="card-body">
-                            <h6>Attack</h6>
-                            <canvas id="lineChart"></canvas>
-                        </div>
-                        <div class="card-arrow">
-                            <div class="card-arrow-top-left"></div>
-                            <div class="card-arrow-top-right"></div>
-                            <div class="card-arrow-bottom-left"></div>
-                            <div class="card-arrow-bottom-right"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-arrow">
-                <div class="card-arrow-top-left"></div>
-                <div class="card-arrow-top-right"></div>
-                <div class="card-arrow-bottom-left"></div>
-                <div class="card-arrow-bottom-right"></div>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-md-6">
-        <div class="card mb-3" style="height: 95%">
+        <div class="card border-0 mb-3" style="height: 95%">
             <div class="card-body">
                 <div class="d-flex fw-bold small mb-3">
                     <span class="flex-grow-1">Total Attack</span>
@@ -49,17 +23,20 @@
                    <div id="totalAttackAverage"></div>
                 </div>
             </div>
-            <div class="card-arrow">
-                <div class="card-arrow-top-left"></div>
-                <div class="card-arrow-top-right"></div>
-                <div class="card-arrow-bottom-left"></div>
-                <div class="card-arrow-bottom-right"></div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-0 ">
+            <div class="card-body">
+                <h6 class="mb-4">Top 10 Attacker IP</h6>
+                <canvas id="top10IpTenant"></canvas>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
+{{-- <div class="row">
     <div class="col-md-6">
         <div class="card">
             <div class="card-body">
@@ -90,10 +67,23 @@
     </div>
 
     <div class="col-md-6">
-        <div class="card">
+
+        <div class="card mb-3">
             <div class="card-body">
-                <h6 class="mb-4">Top 10 Attacker IP</h6>
-                <canvas id="top10IpTenant"></canvas>
+                <div id="chartJsLineChart" class="mb-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>Attack</h6>
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                        <div class="card-arrow">
+                            <div class="card-arrow-top-left"></div>
+                            <div class="card-arrow-top-right"></div>
+                            <div class="card-arrow-bottom-left"></div>
+                            <div class="card-arrow-bottom-right"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="card-arrow">
                 <div class="card-arrow-top-left"></div>
@@ -103,7 +93,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
 @endsection
 

@@ -22,6 +22,26 @@ var attackLocations = [
     { from: [25.276987, 55.296249], to: [35.6895, 139.6917] }, // Dubai → Tokyo
     { from: [-22.9068, -43.1729], to: [48.8566, 2.3522] }, // Rio de Janeiro → Paris
     { from: [30.0444, 31.2357], to: [51.5074, -0.1278] }, // Cairo → London
+    { from: [37.7749, -122.4194], to: [40.7128, -74.0060] }, // San Francisco → New York
+    { from: [51.5074, -0.1278], to: [48.8566, 2.3522] },     // London → Paris
+    { from: [35.6895, 139.6917], to: [37.7749, -122.4194] }, // Tokyo → San Francisco
+    { from: [55.7558, 37.6173], to: [39.9042, 116.4074] },   // Moscow → Beijing
+    { from: [40.7128, -74.0060], to: [34.0522, -118.2437] }, // New York → Los Angeles
+    { from: [48.8566, 2.3522], to: [35.6895, 139.6917] },    // Paris → Tokyo
+    { from: [52.5200, 13.4050], to: [40.7128, -74.0060] },   // Berlin → New York
+    { from: [28.6139, 77.2090], to: [37.7749, -122.4194] },  // Delhi → San Francisco
+    { from: [1.3521, 103.8198], to: [35.6895, 139.6917] },   // Singapore → Tokyo
+    { from: [19.0760, 72.8777], to: [48.8566, 2.3522] },     // Mumbai → Paris
+    { from: [41.9028, 12.4964], to: [52.5200, 13.4050] },    // Rome → Berlin
+    { from: [34.0522, -118.2437], to: [51.5074, -0.1278] },  // Los Angeles → London
+    { from: [39.9042, 116.4074], to: [40.7128, -74.0060] },  // Beijing → New York
+    { from: [-33.8688, 151.2093], to: [35.6895, 139.6917] }, // Sydney → Tokyo
+    { from: [55.7558, 37.6173], to: [34.0522, -118.2437] },  // Moscow → Los Angeles
+    { from: [35.6762, 139.6503], to: [19.0760, 72.8777] },   // Tokyo → Mumbai
+    { from: [40.4168, -3.7038], to: [37.7749, -122.4194] },  // Madrid → San Francisco
+    { from: [25.276987, 55.296249], to: [35.6895, 139.6917] }, // Dubai → Tokyo
+    { from: [-22.9068, -43.1729], to: [48.8566, 2.3522] },   // Rio de Janeiro → Paris
+    { from: [30.0444, 31.2357], to: [51.5074, -0.1278] },    // Cairo → London
 ];
 
 var activeMarkers = [];
@@ -30,7 +50,7 @@ function generateRandomAttack() {
     var mapObject = $('#jvectorMap').vectorMap('get', 'mapObject');
 
     if (!mapObject) {
-        console.error("Peta belum tersedia. Tidak bisa menambahkan marker.");
+        console.error("Map not ready yet.");
         return;
     }
 
@@ -55,7 +75,7 @@ function drawAttack(from, to) {
     var mapObject = $('#jvectorMap').vectorMap('get', 'mapObject');
 
     if (!mapObject) {
-        console.error("Peta belum dimuat.");
+        console.error("Map not ready yet.");
         return;
     }
 
@@ -63,7 +83,7 @@ function drawAttack(from, to) {
     var end = mapObject.latLngToPoint ? mapObject.latLngToPoint(to[0], to[1]) : null;
 
     if (!start || !end) {
-        console.error("Koordinat tidak valid atau fungsi tidak tersedia.");
+        console.error("Coordinate unvalid.");
         return;
     }
 
@@ -146,8 +166,8 @@ var handleRenderVectorMap = function () {
             }
         });
 
-        // Jalankan animasi serangan setiap 3 detik
-        setInterval(generateRandomAttack, 3000);
+        // Jalankan animasi serangan setiap 2 detik
+        setInterval(generateRandomAttack, 1000);
     }
 };
 
