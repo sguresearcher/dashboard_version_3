@@ -3,27 +3,33 @@
 
 <div class="row">
     <!-- BEGIN col-6 -->
-    <div class="col-xl-4">
-        <h4>Summary Per Day</h4>
+    <div class="col-md-3">
+        <h4>Attack Information</h4>
         <!-- BEGIN card -->
-        <div class="card border-0 mb-3">
+        <div class="card border-0 mb-2">
             <!-- BEGIN card-body -->
             <div class="card-body">
                 <!-- BEGIN title -->
                 <div class="d-flex fw-bold small mb-3">
-                    <span class="flex-grow-1">Total Attack</span>
+                    <span class="flex-grow-1" id="titleShow"></span>
                 </div>
                 <div class="mb-3">
                    <h2 id="totalAttack">Loading....</h2>
-                </div>
-
-                <div class="d-flex fw-bold small mb-3">
-                    <span class="flex-grow-1">Average per day</span>
                 </div>
                 <div class="mb-3">
                     <div class="mb-3">
                         <div id="totalAttackAverage"></div>
                      </div>
+                </div>
+                <div class="d-flex">
+                    <div class="mr-2">
+                        <label for="">Average</label>
+                        <input type="checkbox" id="showAverage">
+                    </div>
+                    <div class="ms-2">
+                        <label for="">Total</label>
+                        <input type="checkbox" id="showTotal" checked>
+                    </div>
                 </div>
             </div>
         </div>
@@ -32,7 +38,7 @@
     <!-- END col-6 -->
     
     <!-- BEGIN col-6 -->
-    <div class="col-xl-8">
+    <div class="col-md-7">
         <!-- BEGIN card -->
         <div id="jVectorMap" class="mb-5">
             <h4>Threat Map</h4>
@@ -44,9 +50,24 @@
         </div>
         <!-- END card -->
     </div>
+
+    <div class="col-md-2">
+        <!-- BEGIN card -->
+       <div class="d-flex">
+        <div class="mr-2">
+            <label for="">Day</label>
+            <input type="checkbox" id="showDay" checked>
+        </div>
+        <div class="ms-2">
+            <label for="">Hour</label>
+            <input type="checkbox" id="showHour">
+        </div>
+       </div>
+        <!-- END card -->
+    </div>
 </div>
 <div class="row">
-    <div class="col-md-6 mb-4 mb-md-0">
+    <div class="col-md-3 mb-4 mb-md-0">
         <div class="card border-0">
             <div class="card-body table-scroll">
                 <table id="attackSensor" class="table w-100">
@@ -63,13 +84,31 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+
+    <div class="col-md-3 mb-4 mb-md-0">
+        <div class="card border-0">
+            <div class="card-body table-scroll">
+                <table id="attackSourceIP" class="table w-100">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Source IP</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4 mb-md-0">
         <div class="card border-0">
             <div class="card-body table-scroll">
                 <table id="top10IpAttacker" class="table w-100">
                     <thead>
                             <th>No</th>
-                            <th>Attack IP</th>
                             <th>Destination Ip</th>
                             <th>Protocol</th>
                             <th>Port</th>
@@ -127,6 +166,40 @@
 
 
 <script>
+     function fetchTableDataSourceIp() {
+        fetch('/data/guest/top-10')
+            .then(response => response.json())
+            .then(result => {
+                const tbody = document.querySelector('#attackSourceIP tbody');
+                tbody.innerHTML = '';
+
+                const data = result.total_attack?.data || [];
+
+                data.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                            <td>${index + 1}.</td>
+                            <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${item.total_attack || '<span style="opacity:0.5">-</span>'}</td>
+                    `;
+                    tbody.appendChild(row);
+
+                    if (index === 0) {
+                        row.classList.add('highlight-row');
+                        setTimeout(() => {
+                            row.classList.remove('highlight-row');
+                        }, 10000);
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching table data:', error));
+    }
+
+    fetchTableDataSourceIp();
+
+    setInterval(fetchTableDataSourceIp, 60000);
+
+
     function fetchTableData() {
         fetch('/data/tenant/top-10')
             .then(response => response.json())
@@ -140,7 +213,6 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                             <td>${index + 1}.</td>
-                            <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.target_address || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
@@ -165,15 +237,36 @@
 </script>
 
 <script>
-    function fetchAttackData() {
+ $(document).ready(function() {
+    function updateDisplay() {
+        const isDay = $('#showDay').is(':checked');
+        const isHour = $('#showHour').is(':checked');
+        const isAverage = $('#showAverage').is(':checked');
+        const isTotal = $('#showTotal').is(':checked');
+
         $.ajax({
             url: '/data/tenant/total-attack',
             method: 'GET',
             success: function(response) {
-                if (response.total_attack !== undefined) {
-                    $('#totalAttack').text(response.total_attack.toLocaleString());
+                const container = $('#totalAttack');
+                container.empty();
+
+                let value = null;
+
+                if (isDay && isAverage) {
+                    value = response.average_total_attack_per_day;
+                    container.text(`${value}`);
+                } else if (isDay && isTotal) {
+                    value = response.total_attack;
+                    container.text(`${value}`);
+                } else if (isHour && isTotal) {
+                    value = response.average_total_attack_per_day;
+                    container.text(`${value}`);
+                } else if (isHour && isAverage) {
+                    value = response.average_total_attack_per_minute;
+                    container.text(`${value}`);
                 } else {
-                    $('#totalAttack').text('No data');
+                    container.text('No data to show');
                 }
             },
             error: function() {
@@ -182,14 +275,162 @@
         });
     }
 
-    $(document).ready(function() {
-        fetchAttackData();
-
-        setInterval(fetchAttackData, 18000000);
+    // Ensure exclusivity
+    $('#showAverage').on('change', function () {
+        if (this.checked) $('#showTotal').prop('checked', false);
+        updateDisplay();
     });
+
+    $('#showTotal').on('change', function () {
+        if (this.checked) $('#showAverage').prop('checked', false);
+        updateDisplay();
+    });
+
+    $('#showHour').on('change', function () {
+        if (this.checked) $('#showDay').prop('checked', false);
+        updateDisplay();
+    });
+
+    $('#showDay').on('change', function () {
+        if (this.checked) $('#showHour').prop('checked', false);
+        updateDisplay();
+    });
+
+    // Load default view
+    updateDisplay();
+});
+
+$(document).ready(function() {
+    function updateAverage() {
+        const isDay = $('#showDay').is(':checked');
+        const isHour = $('#showHour').is(':checked');
+        const isAverage = $('#showAverage').is(':checked');
+        const isTotal = $('#showTotal').is(':checked');
+
+        $.ajax({
+            url: '/data/tenant/average',
+            method: 'GET',
+            success: function(response) {
+                const container = $('#totalAttackAverage');
+                container.empty();
+
+                const data = response.sensor_attack?.data || [];
+
+                if (isDay && isAverage) {
+                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+
+                    data.forEach(item => {
+                        const sensorName = item.sensor || 'Unknown';
+                        const averagePerHour = item.average_per_hour ?? 0;
+
+                        const li = $(`<li><strong>${sensorName}</strong>: ${averagePerHour}</li>`);
+
+                        ul.append(li);
+                    });
+                    container.append(ul);
+
+                } else if (isDay && isTotal) {
+
+                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+
+                    data.forEach(item => {
+                        const sensorName = item.sensor || 'Unknown';
+                        const total = item.total_per_day ?? 0;
+
+                        const li = $(`<li><strong>${sensorName}</strong>: ${total}</li>`);
+
+                        ul.append(li);
+                    });
+
+                    container.append(ul);
+
+                } else if (isHour && isTotal) {
+                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+
+                    data.forEach(item => {
+                        const sensorName = item.sensor || 'Unknown';
+                        const averagePerDay = item.average_per_hour ?? 0;
+
+                        const li = $(`<li><strong>${sensorName}</strong>: ${averagePerDay}</li>`);
+
+                        ul.append(li);
+                    });
+                    container.append(ul);
+
+                } else if (isHour && isAverage) {
+                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+
+                    data.forEach(item => {
+                        const sensorName = item.sensor || 'Unknown';
+                        const averagePerHour = item.average_per_minute ?? 0;
+
+                        const li = $(`<li><strong>${sensorName}</strong>: ${averagePerHour}</li>`);
+
+                        ul.append(li);
+                    });
+                    container.append(ul);
+                    
+                } else {
+                    container.text('No data to show');
+                }
+            },
+            error: function() {
+                $('#totalAttackAverage').text('Failed to load');
+            }
+        });
+    }
+
+    // Ensure exclusivity
+    $('#showAverage').on('change', function () {
+        if (this.checked) $('#showTotal').prop('checked', false);
+        updateAverage();
+    });
+
+    $('#showTotal').on('change', function () {
+        if (this.checked) $('#showAverage').prop('checked', false);
+        updateAverage();
+    });
+
+    $('#showHour').on('change', function () {
+        if (this.checked) $('#showDay').prop('checked', false);
+        updateAverage();
+    });
+
+    $('#showDay').on('change', function () {
+        if (this.checked) $('#showHour').prop('checked', false);
+        updateAverage();
+    });
+
+    updateAverage();
+});
+
+
+
+    // function fetchAttackData() {
+    //     $.ajax({
+    //         url: '/data/tenant/total-attack',
+    //         method: 'GET',
+    //         success: function(response) {
+    //             if (response.total_attack !== undefined) {
+    //                 $('#totalAttack').text(response.total_attack.toLocaleString());
+    //             } else {
+    //                 $('#totalAttack').text('No data');
+    //             }
+    //         },
+    //         error: function() {
+    //             $('#totalAttack').text('Failed to load');
+    //         }
+    //     });
+    // }
+
+    // $(document).ready(function() {
+    //     fetchAttackData();
+
+    //     setInterval(fetchAttackData, 10800000);
+    // });
 </script>
 
-<script>
+{{-- <script>
     function fetchAttackDataAverage() {
         $.ajax({
             url: '/data/tenant/average',
@@ -224,14 +465,79 @@
     $(document).ready(function() {
         fetchAttackDataAverage();
 
-        setInterval(fetchAttackDataAverage, 18000000);
+        setInterval(fetchAttackDataAverage, 10800000);
     });
-</script>
+</script> --}}
 
 @endauth
 
 @guest
 <script>
+
+$(document).ready(function() {
+    function updateDisplay() {
+        const isDay = $('#showDay').is(':checked');
+        const isHour = $('#showHour').is(':checked');
+        const isAverage = $('#showAverage').is(':checked');
+        const isTotal = $('#showTotal').is(':checked');
+
+        $.ajax({
+            url: 'data/guest/get-total-attack-sensor-average',
+            method: 'GET',
+            success: function(response) {
+                const container = $('#totalAttack');
+                container.empty();
+
+                let value = null;
+
+                if (isDay && isAverage) {
+                    value = response.average_total_attack_per_day;
+                    container.text(`${value}`);
+                } else if (isDay && isTotal) {
+                    value = response.total_attack;
+                    container.text(`${value}`);
+                } else if (isHour && isTotal) {
+                    value = response.average_total_attack_per_day;
+                    container.text(`${value}`);
+                } else if (isHour && isAverage) {
+                    value = response.average_total_attack_per_minute;
+                    container.text(`${value}`);
+                } else {
+                    container.text('No data to show');
+                }
+            },
+            error: function() {
+                $('#totalAttack').text('Failed to load');
+            }
+        });
+    }
+
+    // Ensure exclusivity
+    $('#showAverage').on('change', function () {
+        if (this.checked) $('#showTotal').prop('checked', false);
+        updateDisplay();
+    });
+
+    $('#showTotal').on('change', function () {
+        if (this.checked) $('#showAverage').prop('checked', false);
+        updateDisplay();
+    });
+
+    $('#showHour').on('change', function () {
+        if (this.checked) $('#showDay').prop('checked', false);
+        updateDisplay();
+    });
+
+    $('#showDay').on('change', function () {
+        if (this.checked) $('#showHour').prop('checked', false);
+        updateDisplay();
+    });
+
+    // Load default view
+    updateDisplay();
+});
+
+
     function fetchTableData() {
         fetch('/data/guest/top-10')
             .then(response => response.json())
@@ -245,7 +551,6 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                             <td>${index + 1}.</td>
-                            <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.target_address || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
@@ -267,9 +572,43 @@
     fetchTableData();
 
     setInterval(fetchTableData, 60000);
+
+
+    function fetchTableDataSourceIp() {
+        fetch('/data/guest/top-10')
+            .then(response => response.json())
+            .then(result => {
+                const tbody = document.querySelector('#attackSourceIP tbody');
+                tbody.innerHTML = '';
+
+                const data = result.total_attack?.data || [];
+
+                data.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                            <td>${index + 1}.</td>
+                            <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${item.total_attack || '<span style="opacity:0.5">-</span>'}</td>
+                    `;
+                    tbody.appendChild(row);
+
+                    if (index === 0) {
+                        row.classList.add('highlight-row');
+                        setTimeout(() => {
+                            row.classList.remove('highlight-row');
+                        }, 10000);
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching table data:', error));
+    }
+
+    fetchTableDataSourceIp();
+
+    setInterval(fetchTableDataSourceIp, 60000);
 </script>
 
-<script>
+{{-- <script>
     function fetchAttackData() {
         $.ajax({
             url: '/data/guest/total-attack',
@@ -292,10 +631,18 @@
 
         setInterval(fetchAttackData, 18000000);
     });
-</script>
+</script> --}}
 
 <script>
-    function fetchAttackDataAverage() {
+
+
+$(document).ready(function() {
+    function updateAverage() {
+        const isDay = $('#showDay').is(':checked');
+        const isHour = $('#showHour').is(':checked');
+        const isAverage = $('#showAverage').is(':checked');
+        const isTotal = $('#showTotal').is(':checked');
+
         $.ajax({
             url: '/data/guest/get-attack-sensor-average',
             method: 'GET',
@@ -305,19 +652,62 @@
 
                 const data = response.sensor_attack?.data || [];
 
-                if (data.length > 0) {
+                if (isDay && isAverage) {
                     const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
 
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
-                        const average = item.average_per_hour ?? 0;
-                        const li = $(`<li><strong>${sensorName}</strong>: ${average} / jam</li>`);
+                        const averagePerHour = item.average_per_hour ?? 0;
+
+                        const li = $(`<li><strong>${sensorName}</strong>: ${averagePerHour}</li>`);
+
+                        ul.append(li);
+                    });
+                    container.append(ul);
+
+                } else if (isDay && isTotal) {
+
+                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+
+                    data.forEach(item => {
+                        const sensorName = item.sensor || 'Unknown';
+                        const total = item.total_per_day ?? 0;
+
+                        const li = $(`<li><strong>${sensorName}</strong>: ${total}</li>`);
+
                         ul.append(li);
                     });
 
                     container.append(ul);
+
+                } else if (isHour && isTotal) {
+                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+
+                    data.forEach(item => {
+                        const sensorName = item.sensor || 'Unknown';
+                        const averagePerDay = item.average_per_hour ?? 0;
+
+                        const li = $(`<li><strong>${sensorName}</strong>: ${averagePerDay}</li>`);
+
+                        ul.append(li);
+                    });
+                    container.append(ul);
+
+                } else if (isHour && isAverage) {
+                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+
+                    data.forEach(item => {
+                        const sensorName = item.sensor || 'Unknown';
+                        const averagePerHour = item.average_per_minute ?? 0;
+
+                        const li = $(`<li><strong>${sensorName}</strong>: ${averagePerHour}</li>`);
+
+                        ul.append(li);
+                    });
+                    container.append(ul);
+                    
                 } else {
-                    container.text('No data available');
+                    container.text('No data to show');
                 }
             },
             error: function() {
@@ -326,11 +716,31 @@
         });
     }
 
-    $(document).ready(function() {
-        fetchAttackDataAverage();
-
-        setInterval(fetchAttackDataAverage, 18000000);
+    // Ensure exclusivity
+    $('#showAverage').on('change', function () {
+        if (this.checked) $('#showTotal').prop('checked', false);
+        updateAverage();
     });
+
+    $('#showTotal').on('change', function () {
+        if (this.checked) $('#showAverage').prop('checked', false);
+        updateAverage();
+    });
+
+    $('#showHour').on('change', function () {
+        if (this.checked) $('#showDay').prop('checked', false);
+        updateAverage();
+    });
+
+    $('#showDay').on('change', function () {
+        if (this.checked) $('#showHour').prop('checked', false);
+        updateAverage();
+    });
+
+    // Load default view
+    updateAverage();
+});
+
 </script>
 
 <script>
@@ -350,7 +760,7 @@
                             <tr>
                                 <td>${index + 1}.</td>
                                 <td>${item.sensor || '-'}</td>
-                                <td>${item.count || 0}</td>
+                                <td>${item.total || 0}</td>
                             </tr>
                         `;
                         tbody.append(row);
@@ -370,7 +780,5 @@
         setInterval(fetchSensorAttackCount, 18000000); 
     });
 </script>
-
-
 @endguest
 @endpush

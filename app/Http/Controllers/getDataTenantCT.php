@@ -175,7 +175,9 @@ class getDataTenantCT extends Controller
                 ->map(function ($items, $sensor) {
                     return [
                         'sensor' => $sensor ?? 'unknown',
-                        'count' => $items->count()
+                        'total' => $items->count(),
+                        'average_per_hour' => round($items->sum('total') / (24 * 60)),
+                        'average_per_day' => round($items->sum('total') / 24),
                     ];
                 })
                 ->sortByDesc('count')
@@ -195,43 +197,44 @@ class getDataTenantCT extends Controller
     }
     
     
+    public function getSensorAverageAttackCount()
+    {
+            $response = Http::withHeaders([
+                'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
+            ])->timeout(180)->get('http://10.20.100.172:7777/summary/24h');
 
-    public function getSensorAverageAttackCount() {
-        $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
-        ])->timeout(180)->get('http://10.20.100.172:7777/summary/24h');
-    
-        if ($response->successful()) {
+            if (!$response->successful()) {
+                return response()->json(['message' => 'Failed to fetch data!'], 404);
+            }
+
             $summary = $response->json();
             $totalJam = 24;
-    
             $sensorTotals = [];
-    
-            foreach ($summary as $tenant => $data) {
+
+            foreach ($summary as $data) {
                 foreach ($data['combined_attack'] ?? [] as $entry) {
                     $sensor = $entry['sensor'] ?? 'unknown';
                     $sensorTotals[$sensor] = ($sensorTotals[$sensor] ?? 0) + ($entry['total'] ?? 0);
                 }
             }
-    
+
             $data = collect($sensorTotals)->map(function ($total, $sensor) use ($totalJam) {
                 return [
                     'sensor' => $sensor,
-                    'average_per_hour' => round($total / $totalJam, 2)
+                    'average_per_hour' => round($total / $totalJam),
+                    'total_per_day' => $total,
+                    'average_per_minute' => round($total / ($totalJam * 60)),
+
                 ];
             })->sortByDesc('average_per_hour')->values();
-    
+
             return response()->json([
                 'sensor_attack' => [
                     'data' => $data
                 ]
             ], 200);
-        } else {
-            return response()->json([
-                'message' => 'Failed to fetch data!'
-            ], 404);
-        }
     }
+
 
     public function getAttackCountBySensorName($sensor)
     {
@@ -341,14 +344,16 @@ class getDataTenantCT extends Controller
         if ($response->successful()) {
             $rawCode = strtolower(Auth::user()->user_code);
             $cleanCode = str_starts_with($rawCode, 'hp_') ? $rawCode : 'hp_' . $rawCode;
-            $tenant_code = 'ewsdb_' . $cleanCode;            
+            $tenant_code = 'ewsdb_' . $cleanCode;           
 
             //$tenant_code = 'ewsdb_hp_' . strtolower(Auth::user()->user_code) . '_1';
     
             $dataTenant = collect($response->json()[$tenant_code]['combined_attack'] ?? []);
     
             return response()->json([
-                'total_attack' => $dataTenant->sum('total')
+                'total_attack' => round($dataTenant->sum('total')),
+                'average_total_attack_per_day' => round($dataTenant->sum('total') / 24),
+                'average_total_attack_per_minute' => round($dataTenant->sum('total') / (24 * 60)),
             ], 200);
         } else {
             return response()->json([
@@ -467,9 +472,11 @@ class getDataTenantCT extends Controller
                     $total = $items->sum('total');
                     return [
                         'sensor' => $sensor,
-                        'total' => $total,
-                        'average_per_hour' => round($total / 24, 2)
-                    ];
+                        'average_per_hour' => round($total / 24),
+                        'total_per_day' => $total,
+                        'average_per_minute' => round($total / (24 * 60)),
+                            
+                        ];
                 })
                 ->sortByDesc('total')
                 ->values();
@@ -485,6 +492,80 @@ class getDataTenantCT extends Controller
             ], 404);
         }
     }
+
+    public function getDataTotalAttackAverageGuestDashboard(){
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
+        ])->timeout(180)->get('http://10.20.100.172:7777/summary/24h');
+    
+        if ($response->successful()) {
+            $summary = $response->json();
+            $totalJam = 24;
+            
+            $totalAttack = 0;
         
+            foreach ($summary as $tenant => $data) {
+                foreach ($data['combined_attack'] ?? [] as $entry) {
+                    $totalAttack += $entry['total'] ?? 0;
+                }
+            }
+        
+            $totalPerHour = round($totalAttack / $totalJam);
+            $averagePerMinute = round($totalAttack / count($summary) / $totalJam);
+        
+            return response()->json([
+                'average_total_attack_per_day' => $totalPerHour,
+                'total_attack' => $totalAttack,
+                'hours_counted' => $totalJam,
+                'average_total_attack_per_minute' => $averagePerMinute,
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Failed to fetch data!'
+            ], 404);
+        }
+        
+    }
+
+    public function getTop10SourceIpGuest(){
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
+        ])->timeout(180)->get('http://10.20.100.172:7777/summary/24h');
+    
+        if ($response->successful()) {
+            $summary = $response->json();
+            $combined = collect();
+    
+            foreach ($summary as $tenant => $data) {
+                foreach ($data['combined_attack'] ?? [] as $entry) {
+                    $combined->push($entry);
+                }
+            }
+    
+            $topAttackersSourceIp = $combined->groupBy('source_address')
+                ->map(function ($items, $ip) {
+                    return [
+                        'source_address' => $ip,
+                        'total_attack' => collect($items)->sum('total')
+                    ];
+                })
+                ->sortByDesc('total_attack')
+                ->take(10)
+                ->values();
+    
+            return response()->json([
+                'total_attack' => [
+                    'data' => $topAttackersSourceIp
+                ]
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Failed to fetch data!'
+            ], 404);
+        }
+
+    }
+
 
 }

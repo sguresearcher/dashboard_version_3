@@ -8,6 +8,12 @@ use App\Http\Controllers\UsersCT;
 use Illuminate\Support\Facades\Route;
 
 
+
+Route::get('/', function () {
+    return view('pages.dashboard');
+});
+
+
 Route::get('/login', [LoginCT::class, 'index'])->name('login');
 Route::post('/login', [LoginCT::class, 'auth']);
 Route::post('/logout', [LoginCT::class, 'logout']);
@@ -17,7 +23,7 @@ Route::middleware(['auth','superadmin', 'revalidate'])->prefix('/superadmin')->g
 });
 
 Route::middleware(['auth','revalidate'])->group(function(){
-    Route::get('/', [UsersCT::class, 'index']);
+    Route::get('/home', [UsersCT::class, 'index']);
     Route::get('/sensor/{sensor}', [UsersCT::class, 'bySensor']);
     Route::get('/setting', [UsersCT::class, 'setting']);
 });
@@ -26,6 +32,7 @@ Route::get('/data/{sensor}/h', [getDataTenantCT::class, 'totalAttack']);
 Route::get('/data/{sensor}/top-10-ip', [getDataTenantCT::class, 'top10AttackerIp']);
 Route::get('/data/{sensor}/total', [getDataTenantCT::class, 'total']);
 Route::get('/data/guest/total-attack', [getDataTenantCT::class, 'totalAttackGuest']);
+Route::get('/data/guest/get-total-attack-sensor-average', [getDataTenantCT::class, 'getDataTotalAttackAverageGuestDashboard']);
 Route::get('/data/guest/top-10', [getDataTenantCT::class, 'getDataTop10Table']);
 Route::get('/data/tenant/total-attack', [getDataTenantCT::class, 'totalAttackTenantDashboard']);
 Route::get('/data/tenant/top-10', [getDataTenantCT::class, 'getDataTop10TenantDashboard']);
@@ -33,15 +40,14 @@ Route::get('/data/tenant/average', [getDataTenantCT::class, 'getDataAverageTenan
 Route::get('/data/guest/get-attack-sensor', [getDataTenantCT::class, 'getSensorAttackCount']);
 Route::get('/data/guest/get-attack-sensor-average', [getDataTenantCT::class, 'getSensorAverageAttackCount']);
 Route::get('/data/guest/get-attack-sensor-count', [getDataTenantCT::class, 'getSensorAttackCount']);
+// Route::get('/data/guest/top10/source-ip', [getDataTenantCT::class, 'getTop10SourceIpGuest']);
 Route::get('/data/tenant/get-attack-sensor-count', [getDataTenantCT::class, 'getSensorAttackCountTenant']);
 
 Route::get('/data/tenant/sensor/{sensor}/detail', [getDataTenantCT::class, 'getAttackCountBySensorName']);
 Route::get('/data/tenant/sensor/{sensor}/top10', [getDataTenantCT::class, 'getTop10AttackersBySensor']);
 
 
-Route::get('/', function () {
-    return view('pages.dashboard');
-});
+
 
 
 
