@@ -17,21 +17,44 @@ class getDataTenantCT extends Controller
         $this->username = env('API_USERNAME_SECRETO'); 
         $this->password = env('API_PASSWORD_SECRETO');
     }
-    public function totalAttack($sensor){
-        // $response = Http::get("http://10.20.100.172:7777/data/telkom/conpot/24h");
-        $response = Http::withBasicAuth($this->username, $this->password)->get("http://10.20.100.172:7777/data/". Auth::user()->user_code ."/". $sensor ."/24h");
+    
+    public function totalAttack($sensor)
+{
+    $response = Http::withBasicAuth($this->username, $this->password)
+        ->get("http://10.20.100.172:7777/data/" . Auth::user()->user_code . "/" . $sensor . "/24h");
 
- 
-        if ($response->successful()) {
-            $data = $response->json();
-            return response()->json([
-                'total_attack' => count($data)
-            ]);
-        } else {
-            return response()->json(['error'=>'failed to fetch data!']);
-        }
-        
+    if ($response->successful()) {
+        $rawData = $response->json();
+
+        $data = collect($rawData['data'] ?? $rawData);
+
+        $filtered = match (strtolower($sensor)) {
+            'honeytrap' => $data->filter(function ($item) {
+                return isset($item['category']) &&
+                       strtolower($item['category']) !== 'heartbeat' &&
+                       isset($item['source-ip']) &&
+                       filter_var($item['source-ip'], FILTER_VALIDATE_IP);
+            }),
+
+            'cowrie', 'conpot', 'dionaea', 'dionaea_ews' => $data->filter(function ($item) {
+                return isset($item['src_ip']) && filter_var($item['src_ip'], FILTER_VALIDATE_IP);
+            }),
+
+            'rdpy' => $data->filter(function ($item) {
+                return isset($item['client_ip']) && filter_var($item['client_ip'], FILTER_VALIDATE_IP);
+            }),
+
+            default => collect()
+        };
+
+        return response()->json([
+            'total_attack' => $filtered->count()
+        ]);
     }
+
+    return response()->json(['error' => 'failed to fetch data!'], 404);
+}
+
 
     public function top10AttackerIp($sensor){
         $response = Http::withBasicAuth($this->username, $this->password)->get("http://10.20.100.172:7777/data/". Auth::user()->user_code ."/". $sensor ."/24h");
@@ -105,7 +128,6 @@ class getDataTenantCT extends Controller
                 }
             }
     
-            // Gabungkan berdasarkan IP source
             $topAttackers = $combined->groupBy('source_address')
                 ->map(function ($items, $ip) {
                     return [
@@ -227,12 +249,11 @@ class getDataTenantCT extends Controller
                 return isset($item['src_ip']) && !empty($item['src_ip']);
             });
 
-            // Group by IP dan hitung jumlah serangan
             $grouped = $filtered->groupBy('src_ip')->map(function ($entries, $ip) {
                 return [
                     'source_address' => $ip,
                     'count' => $entries->count(),
-                    'total' => $entries->count() // kamu bisa modifikasi ini pakai where()
+                    'total' => $entries->count()
                 ];
             })->sortByDesc('total')->values();
 
@@ -252,33 +273,63 @@ class getDataTenantCT extends Controller
     {
         $response = Http::withBasicAuth($this->username, $this->password)
             ->get("http://10.20.100.172:7777/data/" . Auth::user()->user_code . "/" . $sensor . "/24h");
-
-        if ($response->successful()) {
-            $rawData = $response->json();
-
-            $data = collect($rawData['data'] ?? $rawData);
-
-            $filtered = $data->filter(fn ($item) => isset($item['src_ip']) && !empty($item['src_ip']));
-
-            $grouped = $filtered->groupBy('src_ip')->map(function ($entries, $ip) {
-                return [
-                    'source_address' => $ip,
-                    'count' => $entries->count(),
-                    'total' => $entries->count()
-                ];
-            })->sortByDesc('total')->take(10)->values();
-
+    
+        if (!$response->successful()) {
             return response()->json([
                 'sensor' => $sensor,
-                'data' => $grouped
-            ]);
+                'data' => []
+            ], 404);
         }
-
+    
+        $rawData = $response->json();
+        $data = collect($rawData['data'] ?? []);
+    
+        switch (strtolower($sensor)) {
+            case 'cowrie':
+            case 'dionaea':
+            case 'dionaea_ews':
+            case 'conpot':
+                $filtered = $data->filter(fn ($item) => isset($item['src_ip']));
+                $grouped = $filtered->groupBy('src_ip')->map(fn ($items, $ip) => [
+                    'source_address' => $ip,
+                    'count' => $items->count(),
+                    'total' => $items->count()
+                ]);
+                break;
+    
+            case 'honeytrap':
+                $filtered = $data->filter(fn ($item) => isset($item['source-ip']));
+                $grouped = $filtered->groupBy('source-ip')->map(fn ($items, $ip) => [
+                    'source_address' => $ip,
+                    'count' => $items->count(),
+                    'total' => $items->count()
+                ]);
+                break;
+    
+            case 'rdpy':
+                // GANTI 'client_ip' jika field-nya berbeda setelah kamu cek log asli RDPY
+                $filtered = $data->filter(fn ($item) => isset($item['client_ip']));
+                $grouped = $filtered->groupBy('client_ip')->map(fn ($items, $ip) => [
+                    'source_address' => $ip,
+                    'count' => $items->count(),
+                    'total' => $items->count()
+                ]);
+                break;
+    
+            default:
+                return response()->json([
+                    'sensor' => $sensor,
+                    'data' => []
+                ], 200);
+        }
+    
         return response()->json([
             'sensor' => $sensor,
-            'data' => []
-        ], 404);
+            'data' => $grouped->sortByDesc('total')->take(10)->values()
+        ]);
     }
+    
+
 
 
 

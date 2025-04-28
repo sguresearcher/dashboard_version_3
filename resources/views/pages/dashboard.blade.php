@@ -206,7 +206,7 @@
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
                         const average = item.average_per_hour ?? 0;
-                        const li = $(`<li><strong>${sensorName}</strong>: ${average} / jam</li>`);
+                        const li = $(`<li><strong>${sensorName}</strong>: ${average} / hour</li>`);
                         ul.append(li);
                     });
 
