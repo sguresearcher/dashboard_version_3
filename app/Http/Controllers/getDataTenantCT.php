@@ -290,7 +290,6 @@ class getDataTenantCT extends Controller
 
             $rawData = $response->json();
 
-            // Ambil data tenant berdasarkan user_code
             $tenantKey = "ewsdb_" . strtolower(Auth::user()->user_code) . "_1";
 
             if (!isset($rawData[$tenantKey]['combined_attack'])) {
@@ -302,13 +301,11 @@ class getDataTenantCT extends Controller
 
             $data = collect($rawData[$tenantKey]['combined_attack']);
 
-            // Filter berdasarkan sensor
             $filtered = $data->filter(fn ($item) =>
                 isset($item['sensor'], $item['source_address']) &&
                 strtolower($item['sensor']) === strtolower($sensor)
             );
 
-            // Group dan hitung total per source_address
             $grouped = $filtered->groupBy('source_address')->map(function ($items, $ip) {
                 $total = $items->sum('total');
                 return [
