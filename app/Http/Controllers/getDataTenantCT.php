@@ -277,64 +277,53 @@ class getDataTenantCT extends Controller
     
 
     public function getTop10AttackersBySensor($sensor)
-    {
-        $response = Http::withBasicAuth($this->username, $this->password)
-            ->get("http://10.20.100.172:7777/data/" . Auth::user()->user_code . "/" . $sensor . "/24h");
-    
-        if (!$response->successful()) {
-            return response()->json([
-                'sensor' => $sensor,
-                'data' => []
-            ], 404);
-        }
-    
-        $rawData = $response->json();
-        $data = collect($rawData['data'] ?? []);
-    
-        switch (strtolower($sensor)) {
-            case 'cowrie':
-            case 'dionaea':
-            case 'dionaea_ews':
-            case 'conpot':
-                $filtered = $data->filter(fn ($item) => isset($item['src_ip']));
-                $grouped = $filtered->groupBy('src_ip')->map(fn ($items, $ip) => [
-                    'source_address' => $ip,
-                    'count' => $items->count(),
-                    'total' => $items->count()
-                ]);
-                break;
-    
-            case 'honeytrap':
-                $filtered = $data->filter(fn ($item) => isset($item['source-ip']));
-                $grouped = $filtered->groupBy('source-ip')->map(fn ($items, $ip) => [
-                    'source_address' => $ip,
-                    'count' => $items->count(),
-                    'total' => $items->count()
-                ]);
-                break;
-    
-            case 'rdpy':
-                // GANTI 'client_ip' jika field-nya berbeda setelah kamu cek log asli RDPY
-                $filtered = $data->filter(fn ($item) => isset($item['client_ip']));
-                $grouped = $filtered->groupBy('client_ip')->map(fn ($items, $ip) => [
-                    'source_address' => $ip,
-                    'count' => $items->count(),
-                    'total' => $items->count()
-                ]);
-                break;
-    
-            default:
+        {
+            $response = Http::withBasicAuth($this->username, $this->password)
+                ->get("http://10.20.100.172:7777/summary/24h");
+
+            if (!$response->successful()) {
                 return response()->json([
                     'sensor' => $sensor,
                     'data' => []
-                ], 200);
+                ], 404);
+            }
+
+            $rawData = $response->json();
+
+            // Ambil data tenant berdasarkan user_code
+            $tenantKey = "ewsdb_" . strtolower(Auth::user()->user_code) . "_1";
+
+            if (!isset($rawData[$tenantKey]['combined_attack'])) {
+                return response()->json([
+                    'sensor' => $sensor,
+                    'data' => []
+                ]);
+            }
+
+            $data = collect($rawData[$tenantKey]['combined_attack']);
+
+            // Filter berdasarkan sensor
+            $filtered = $data->filter(fn ($item) =>
+                isset($item['sensor'], $item['source_address']) &&
+                strtolower($item['sensor']) === strtolower($sensor)
+            );
+
+            // Group dan hitung total per source_address
+            $grouped = $filtered->groupBy('source_address')->map(function ($items, $ip) {
+                $total = $items->sum('total');
+                return [
+                    'source_address' => $ip,
+                    'count' => $total,
+                    'total' => $total
+                ];
+            });
+
+            return response()->json([
+                'sensor' => $sensor,
+                'data' => $grouped->sortByDesc('total')->take(10)->values()
+            ]);
         }
-    
-        return response()->json([
-            'sensor' => $sensor,
-            'data' => $grouped->sortByDesc('total')->take(10)->values()
-        ]);
-    }
+
     
 
 
