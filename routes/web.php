@@ -31,6 +31,7 @@ Route::middleware(['auth','revalidate'])->group(function(){
 Route::get('/data/{sensor}/h', [getDataTenantCT::class, 'totalAttack']);
 Route::get('/data/{sensor}/top-10-ip', [getDataTenantCT::class, 'top10AttackerIp']);
 Route::get('/data/{sensor}/total', [getDataTenantCT::class, 'total']);
+Route::get('/data/{sensor}/doughnut-chart', [getDataTenantCT::class, 'getDataDoughnutChart']);
 Route::get('/data/guest/total-attack', [getDataTenantCT::class, 'totalAttackGuest']);
 Route::get('/data/guest/get-total-attack-sensor-average', [getDataTenantCT::class, 'getDataTotalAttackAverageGuestDashboard']);
 Route::get('/data/guest/top-10', [getDataTenantCT::class, 'getDataTop10Table']);

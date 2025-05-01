@@ -27,6 +27,26 @@
     </div>
 
     <div class="col-md-6">
+        <div class="card border-0 mb-3" style="height: 95%">
+            <div class="card-body">
+                <div id="chartJsDoughnutChart">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="h-300px w-300px mx-auto">
+                                <canvas id="doughnutChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   
+</div>
+
+<div class="row">
+    <div class="col-12">
         <div class="card border-0 ">
             <div class="card-body">
                 <h6 class="mb-4">Top 10 Attacker IP</h6>
@@ -34,39 +54,8 @@
             </div>
         </div>
     </div>
-</div>
 
-{{-- <div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body">
-                <div id="chartJsDoughnutChart">
-                    <div class="card">
-                        <div class="card-body">
-                            <h6>Most Used ASN</h6>
-                            <div class="h-300px w-300px mx-auto">
-                                <canvas id="doughnutChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="card-arrow">
-                            <div class="card-arrow-top-left"></div>
-                            <div class="card-arrow-top-right"></div>
-                            <div class="card-arrow-bottom-left"></div>
-                            <div class="card-arrow-bottom-right"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card-arrow">
-                <div class="card-arrow-top-left"></div>
-                <div class="card-arrow-top-right"></div>
-                <div class="card-arrow-bottom-left"></div>
-                <div class="card-arrow-bottom-right"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6">
+    {{-- <div class="col-md-6">
 
         <div class="card mb-3">
             <div class="card-body">
@@ -91,9 +80,9 @@
                 <div class="card-arrow-bottom-left"></div>
                 <div class="card-arrow-bottom-right"></div>
             </div>
-        </div>
+        </div> --}}
     </div>
-</div> --}}
+</div>
 
 @endsection
 
@@ -180,4 +169,47 @@
         setInterval(fetchTop10AttackerChart, 60000);      // setiap 1 menit
     });
 </script>
+
+<script>
+    var ctx6 = document.getElementById('doughnutChart');
+    var doughnutChart = new Chart(ctx6, {
+        type: 'doughnut',
+        data: {
+            labels: [],
+            datasets: [{
+                data: [],
+                backgroundColor: [
+                    '#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#2ecc71',
+                    '#f39c12', '#3498db', '#e74c3c', '#1abc9c', '#9b59b6'
+                ],
+                hoverBackgroundColor: [
+                    '#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#2ecc71',
+                    '#f39c12', '#3498db', '#e74c3c', '#1abc9c', '#9b59b6'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+
+
+    fetch('/data/{{ $sensor }}/doughnut-chart')
+        .then(response => response.json())
+        .then(data => {
+            doughnutChart.data.labels = data.ip_attack_chart.labels;
+            doughnutChart.data.datasets[0].data = data.ip_attack_chart.data;
+            doughnutChart.update();
+        })
+        .catch(error => {
+            console.error('Error loading chart data:', error);
+        });
+</script>
+
 @endpush
