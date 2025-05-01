@@ -120,19 +120,19 @@ var handleRenderChartJs = function() {
 		}
 	});
 	
-	var ctx6 = document.getElementById('doughnutChart');
-	doughnutChart = new Chart(ctx6, {
-		type: 'doughnut',
-		data: {
-			labels: ['Total Visitor', 'New Visitor', 'Returning Visitor'],
-			datasets: [{
-				data: [300, 50, 100],
-				backgroundColor: ['rgba('+ app.color.themeRgb +', .75)', 'rgba('+ app.color.themeRgb +', .25)', 'rgba('+ app.color.themeRgb +', .5)'],
-				hoverBackgroundColor: [app.color.theme, app.color.theme, app.color.theme],
-				borderWidth: 0
-			}]
-		}
-	});
+	// var ctx6 = document.getElementById('doughnutChart');
+	// doughnutChart = new Chart(ctx6, {
+	// 	type: 'doughnut',
+	// 	data: {
+	// 		labels: ['Total Visitor', 'New Visitor', 'Returning Visitor'],
+	// 		datasets: [{
+	// 			data: [300, 50, 100],
+	// 			backgroundColor: ['rgba('+ app.color.themeRgb +', .75)', 'rgba('+ app.color.themeRgb +', .25)', 'rgba('+ app.color.themeRgb +', .5)'],
+	// 			hoverBackgroundColor: [app.color.theme, app.color.theme, app.color.theme],
+	// 			borderWidth: 0
+	// 		}]
+	// 	}
+	// });
 };
 
 /* Controller

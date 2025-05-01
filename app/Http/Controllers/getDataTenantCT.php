@@ -567,5 +567,52 @@ class getDataTenantCT extends Controller
 
     }
 
+    public function getDataDoughnutChart($sensor){
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
+        ])->timeout(180)->get('http://10.20.100.172:7777/summary/24h');
+    
+        if (!$response->successful()) {
+            return response()->json(['message' => 'Failed to fetch data!'], 404);
+        }
+    
+        $rawCode = strtolower(Auth::user()->user_code);
+        $cleanCode = str_starts_with($rawCode, 'hp_') ? $rawCode : 'hp_' . $rawCode;
+        $tenant_code = 'ewsdb_' . $cleanCode;
+    
+        $dataTenant = collect($response->json()[$tenant_code]['combined_attack'] ?? [])
+            ->filter(function($entry) {
+                return strtolower($entry['protocol']) !== 'heartbeat';
+            });
+    
+        // Filter berdasarkan sensor yang diberikan
+        $filteredSensorData = $dataTenant->where('sensor', $sensor);
+    
+        // Kelompokkan dan jumlahkan berdasarkan source_address
+        $topIps = $filteredSensorData->groupBy('source_address')
+            ->map(function ($items, $ip) {
+                return $items->sum('total');
+            })
+            ->sortDesc()
+            ->take(10);
+    
+        // Format untuk Doughnut Chart dan detail
+        $labels = $topIps->keys()->values();
+        $data = $topIps->values();
+        $details = $topIps->map(function ($total, $ip) {
+            return ['ip' => $ip, 'total' => $total];
+        })->values();
+    
+        return response()->json([
+            'sensor' => $sensor,
+            'ip_attack_chart' => [
+                'labels' => $labels,
+                'data' => $data
+            ],
+            'ip_attack_details' => $details
+        ]);
+
+    }
+
 
 }

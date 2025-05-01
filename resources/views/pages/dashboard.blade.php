@@ -109,7 +109,6 @@
                 <table id="top10IpAttacker" class="table w-100">
                     <thead>
                             <th>No</th>
-                            <th>Destination Ip</th>
                             <th>Protocol</th>
                             <th>Port</th>
                             <th>Total</th>
@@ -213,7 +212,6 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                             <td>${index + 1}.</td>
-                            <td>${item.target_address || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.total_attack || '<span style="opacity:0.5">-</span>'}</td>
@@ -551,7 +549,6 @@ $(document).ready(function() {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                             <td>${index + 1}.</td>
-                            <td>${item.target_address || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.total_attack || '<span style="opacity:0.5">-</span>'}</td>
