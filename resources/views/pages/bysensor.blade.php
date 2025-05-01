@@ -169,45 +169,51 @@
 </script>
 
 <script>
-    var ctx6 = document.getElementById('doughnutChartAttack').getContext('2d');
-    var doughnutChart = new Chart(ctx6, {
-        type: 'doughnut',
-        data: {
-            labels: [],
-            datasets: [{
-                data: [],
-                backgroundColor: [
-                    '#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#2ecc71',
-                    '#f39c12', '#3498db', '#e74c3c', '#1abc9c', '#9b59b6'
-                ],
-                hoverBackgroundColor: [
-                    '#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#2ecc71',
-                    '#f39c12', '#3498db', '#e74c3c', '#1abc9c', '#9b59b6'
-                ],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'right'
+    $(document).ready(function () {
+        // Chart Doughnut untuk IP Attacker
+        var ctx6 = document.getElementById('doughnutChartAttack');
+        if (!ctx6) {
+            console.error("Canvas #doughnutChartAttack tidak ditemukan.");
+            return;
+        }
+
+        var doughnutChart = new Chart(ctx6.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        '#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#2ecc71',
+                        '#f39c12', '#3498db', '#e74c3c', '#1abc9c', '#9b59b6'
+                    ],
+                    hoverBackgroundColor: [
+                        '#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#2ecc71',
+                        '#f39c12', '#3498db', '#e74c3c', '#1abc9c', '#9b59b6'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
                 }
             }
-        }
-    });
-
-
-    fetch('/data/{{ $sensor }}/doughnut-chart')
-        .then(response => response.json())
-        .then(data => {
-            doughnutChart.data.labels = data.ip_attack_chart.labels;
-            doughnutChart.data.datasets[0].data = data.ip_attack_chart.data;
-            doughnutChart.update();
-        })
-        .catch(error => {
-            console.error('Error loading chart data:', error);
         });
-</script>
 
+        fetch('/data/{{ $sensor }}/doughnut-chart')
+            .then(response => response.json())
+            .then(data => {
+                doughnutChart.data.labels = data.ip_attack_chart.labels;
+                doughnutChart.data.datasets[0].data = data.ip_attack_chart.data;
+                doughnutChart.update();
+            })
+            .catch(error => {
+                console.error('Error loading chart data:', error);
+            });
+    });
+</script>
 @endpush
