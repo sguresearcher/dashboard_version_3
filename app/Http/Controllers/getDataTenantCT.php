@@ -239,38 +239,42 @@ class getDataTenantCT extends Controller
     public function getAttackCountBySensorName($sensor)
     {
         $response = Http::withBasicAuth($this->username, $this->password)
-            ->get("http://10.20.100.172:7777/data/" . Auth::user()->user_code . "/" . $sensor . "/24h");
-
+            ->timeout(180)
+            ->get("http://10.20.100.172:7777/summary/24h");
+    
         if ($response->successful()) {
+            $rawCode = strtolower(Auth::user()->user_code);
+            $cleanCode = str_starts_with($rawCode, 'hp_') ? $rawCode : 'hp_' . $rawCode;
+            $tenantKey = 'ewsdb_' . $cleanCode;
+    
             $rawData = $response->json();
-
-            // Kalau datanya nested dalam "data": [...]
-            $data = collect($rawData['data'] ?? $rawData);
-
-            // Filter hanya entry yang punya src_ip valid
-            $filtered = $data->filter(function ($item) {
-                return isset($item['src_ip']) && !empty($item['src_ip']);
-            });
-
-            $grouped = $filtered->groupBy('src_ip')->map(function ($entries, $ip) {
+    
+            $entries = collect($rawData[$tenantKey]['combined_attack'] ?? [])
+                ->filter(function ($item) use ($sensor) {
+                    return isset($item['sensor'], $item['source_address']) &&
+                           strtolower($item['sensor']) === strtolower($sensor);
+                });
+    
+            $grouped = $entries->groupBy('source_address')->map(function ($group, $ip) {
+                $total = $group->sum('total');
                 return [
                     'source_address' => $ip,
-                    'count' => $entries->count(),
-                    'total' => $entries->count()
+                    'total' => $total
                 ];
             })->sortByDesc('total')->values();
-
+    
             return response()->json([
                 'sensor' => $sensor,
                 'data' => $grouped
             ]);
         }
-
+    
         return response()->json([
             'sensor' => $sensor,
             'data' => []
         ], 404);
     }
+    
 
     public function getTop10AttackersBySensor($sensor)
     {
