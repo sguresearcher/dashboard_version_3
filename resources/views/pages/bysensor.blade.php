@@ -29,15 +29,13 @@
     <div class="col-md-6">
         <div class="card border-0 mb-3" style="height: 95%">
             <div class="card-body">
-                <div id="chartJsDoughnutChart">
-                    <div class="card">
+                    <div class="card border-0">
                         <div class="card-body">
                             <div class="h-300px w-300px mx-auto">
-                                <canvas id="doughnutChart"></canvas>
+                                <canvas id="doughnutChartAttack"></canvas>
                             </div>
                         </div>
                     </div>
-                </div>
             </div>
         </div>
     </div>
@@ -47,7 +45,7 @@
 
 <div class="row">
     <div class="col-12">
-        <div class="card border-0 ">
+        <div class="card border-0">
             <div class="card-body">
                 <h6 class="mb-4">Top 10 Attacker IP</h6>
                 <canvas id="top10IpTenant"></canvas>
@@ -128,7 +126,7 @@
                         data: {
                             labels: labels,
                             datasets: [{
-                                label: 'Jumlah Serangan per IP',
+                                label: 'Total Attack per IP',
                                 data: values,
                                 backgroundColor: 'rgba(100, 149, 237, 0.25)',
                                 borderColor: 'rgba(100, 149, 237, 1)',
@@ -171,7 +169,7 @@
 </script>
 
 <script>
-    var ctx6 = document.getElementById('doughnutChart');
+    var ctx6 = document.getElementById('doughnutChartAttack').getContext('2d');
     var doughnutChart = new Chart(ctx6, {
         type: 'doughnut',
         data: {
