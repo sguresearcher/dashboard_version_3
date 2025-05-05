@@ -94,6 +94,11 @@
                             <span class="menu-text">Dionaea Ews</span>
                         </a>
                     </div>
+                    <div class="menu-item">
+                        <a href="/sensor/elasticpot" class="menu-link">
+                            <span class="menu-text">Elasticpot</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

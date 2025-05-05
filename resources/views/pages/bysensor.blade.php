@@ -17,7 +17,7 @@
                 </div>
 
                 <div class="d-flex fw-bold small mb-3">
-                    <span class="flex-grow-1">Last 24 Hours</span>
+                    <span class="flex-grow-1">Average</span>
                 </div>
                 <div class="mb-3">
                    <div id="totalAttackAverage"></div>
