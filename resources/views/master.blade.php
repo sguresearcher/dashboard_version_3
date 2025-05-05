@@ -89,9 +89,9 @@
 	<script src="{{ asset('assets/js/demo/map.demo.js') }}"></script>
 	{{-- <script src="{{ asset('assets/js/demo/dashboard.demo.js') }}"></script> --}}
 	<script src="{{ asset('assets/plugins/chart.js/dist/chart.umd.js') }}"></script>
-	<script src="{{ asset('assets/js/demo/chart-js.demo.js') }}"></script>
+	{{-- <script src="{{ asset('assets/js/demo/chart-js.demo.js') }}"></script> --}}
 	
-	<script>
+	{{-- <script>
 		var ctx6 = document.getElementById('doughnutChart');
 			doughnutChart = new Chart(ctx6, {
 				type: 'doughnut',
@@ -114,7 +114,7 @@
 					plugins: {
 						legend: {
 							labels: {
-								color: 'white', // Ubah warna teks legenda menjadi putih
+								color: 'white',
 								font: {
 									size: 14 // (Opsional) Ubah ukuran font jika diperlukan
 								}
@@ -124,7 +124,7 @@
 				}
 			});
 
-	</script>
+	</script> --}}
 	@stack('js')
 </body>
 </html>

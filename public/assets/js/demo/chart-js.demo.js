@@ -6,7 +6,7 @@ Website: http://www.seantheme.com/hud/
 */
 
 
-var lineChart, barChart, radarChart, polarAreaChart, pieChart, doughnutChart;
+var lineChart, radarChart, polarAreaChart, pieChart ;
 
 var handleRenderChartJs = function() {
 	Chart.defaults.font.family = app.font.bodyFontFamily;
