@@ -277,49 +277,58 @@ class getDataTenantCT extends Controller
     
 
     public function getTop10AttackersBySensor($sensor)
-        {
-            $response = Http::withBasicAuth($this->username, $this->password)
-                ->get("http://10.20.100.172:7777/summary/24h");
+{
+    $response = Http::withHeaders([
+        'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
+    ])->timeout(180)->get("http://10.20.100.172:7777/summary/24h");
 
-            if (!$response->successful()) {
-                return response()->json([
-                    'sensor' => $sensor,
-                    'data' => []
-                ], 404);
-            }
+    if (!$response->successful()) {
+        return response()->json([
+            'sensor' => $sensor,
+            'data' => []
+        ], 404);
+    }
 
-            $rawData = $response->json();
+    // Build tenant key, with fallback prefix "hp_" if needed
+    $rawCode = strtolower(Auth::user()->user_code);
+    $cleanCode = str_starts_with($rawCode, 'hp_') ? $rawCode : 'hp_' . $rawCode;
+    $tenantKey = 'ewsdb_' . $cleanCode . '_1';
 
-            $tenantKey = "ewsdb_" . strtolower(Auth::user()->user_code) . "_1";
+    $rawData = $response->json();
 
-            if (!isset($rawData[$tenantKey]['combined_attack'])) {
-                return response()->json([
-                    'sensor' => $sensor,
-                    'data' => []
-                ]);
-            }
+    // Cek apakah tenant key tersedia
+    if (!isset($rawData[$tenantKey]['combined_attack'])) {
+        return response()->json([
+            'sensor' => $sensor,
+            'data' => [],
+            'message' => 'Tenant key not found: ' . $tenantKey
+        ]);
+    }
 
-            $data = collect($rawData[$tenantKey]['combined_attack']);
+    $data = collect($rawData[$tenantKey]['combined_attack']);
 
-            $filtered = $data->filter(fn ($item) =>
-                isset($item['sensor'], $item['source_address']) &&
-                strtolower($item['sensor']) === strtolower($sensor)
-            );
+    // Filter berdasarkan sensor, ignore case
+    $filtered = $data->filter(function ($item) use ($sensor) {
+        return isset($item['sensor'], $item['source_address']) &&
+               strtolower($item['sensor']) === strtolower($sensor);
+    });
 
-            $grouped = $filtered->groupBy('source_address')->map(function ($items, $ip) {
-                $total = $items->sum('total');
-                return [
-                    'source_address' => $ip,
-                    'count' => $total,
-                    'total' => $total
-                ];
-            });
+    // Group by IP dan jumlahkan totalnya
+    $grouped = $filtered->groupBy('source_address')->map(function ($items, $ip) {
+        $total = $items->sum('total');
+        return [
+            'source_address' => $ip,
+            'count' => $total,
+            'total' => $total
+        ];
+    });
 
-            return response()->json([
-                'sensor' => $sensor,
-                'data' => $grouped->sortByDesc('total')->take(10)->values()
-            ]);
-        }
+    return response()->json([
+        'sensor' => $sensor,
+        'data' => $grouped->sortByDesc('total')->take(10)->values()
+    ]);
+}
+
 
     
 

@@ -198,7 +198,7 @@
                 responsive: true,
                 plugins: {
                     legend: {
-                        position: 'right'
+                        display: false
                     }
                 }
             }
