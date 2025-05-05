@@ -48,7 +48,7 @@
         <div class="card border-0">
             <div class="card-body">
                 <h6 class="mb-4">Top 10 Attacker IP</h6>
-                <canvas id="top10IpTenant" height="200px"></canvas>
+                <canvas id="top10IpTenant" style="height: 200px; width:100%"></canvas>
             </div>
         </div>
     </div>
