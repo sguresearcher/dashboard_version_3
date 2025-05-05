@@ -101,6 +101,13 @@
                     </div>
                 </div>
             </div>
+
+            <div class="menu-item active">
+                <a href="/monitor" class="menu-link">
+                    <span class="menu-icon"><i class="bi bi-display"></i></span>
+                    <span class="menu-text">Monitor</span>
+                </a>
+            </div>
         </div>
     </div>
     <!-- END scrollbar -->

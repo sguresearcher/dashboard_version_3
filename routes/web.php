@@ -3,6 +3,7 @@
 use App\Http\Controllers\getDataTenantCT;
 use App\Http\Controllers\GuestCT;
 use App\Http\Controllers\LoginCT;
+use App\Http\Controllers\MonitoringSensorCT;
 use App\Http\Controllers\SuperadminCT;
 use App\Http\Controllers\UsersCT;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,7 @@ Route::middleware(['auth','revalidate'])->group(function(){
     Route::get('/home', [UsersCT::class, 'index']);
     Route::get('/sensor/{sensor}', [UsersCT::class, 'bySensor']);
     Route::get('/setting', [UsersCT::class, 'setting']);
+    Route::get('/monitor', [MonitoringSensorCT::class, 'index']);
 });
 
 Route::get('/data/{sensor}/h', [getDataTenantCT::class, 'totalAttack']);
