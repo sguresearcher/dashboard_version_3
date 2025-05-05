@@ -292,7 +292,7 @@ class getDataTenantCT extends Controller
     // Build tenant key, with fallback prefix "hp_" if needed
     $rawCode = strtolower(Auth::user()->user_code);
     $cleanCode = str_starts_with($rawCode, 'hp_') ? $rawCode : 'hp_' . $rawCode;
-    $tenantKey = 'ewsdb_' . $cleanCode . '_1';
+    $tenantKey = 'ewsdb_' . $cleanCode;
 
     $rawData = $response->json();
 
@@ -328,10 +328,6 @@ class getDataTenantCT extends Controller
         'data' => $grouped->sortByDesc('total')->take(10)->values()
     ]);
 }
-
-
-    
-
 
 
 
