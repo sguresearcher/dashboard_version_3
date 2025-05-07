@@ -102,7 +102,7 @@
                 </div>
             </div>
 
-            <div class="menu-item active">
+            <div class="menu-item">
                 <a href="/monitor" class="menu-link">
                     <span class="menu-icon"><i class="bi bi-display"></i></span>
                     <span class="menu-text">Monitor</span>

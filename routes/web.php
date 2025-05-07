@@ -48,6 +48,7 @@ Route::get('/data/tenant/get-attack-sensor-count', [getDataTenantCT::class, 'get
 
 Route::get('/data/tenant/sensor/{sensor}/detail', [getDataTenantCT::class, 'getAttackCountBySensorName']);
 Route::get('/data/tenant/sensor/{sensor}/top10', [getDataTenantCT::class, 'getTop10AttackersBySensor']);
+Route::get('/data/tenant/monitor', [MonitoringSensorCT::class, 'getSensorStatusJson']);
 
 
 
