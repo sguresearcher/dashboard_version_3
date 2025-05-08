@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use Carbon\Carbon;
-
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -62,8 +62,7 @@ class MonitoringSensorCT extends Controller
         return view('pages.monitoring-sensor');
     }
 
-public function getSensorStatusJson()
-    {
+public function getSensorStatusJson(){
 
         $tenantKey = 'ewsdb_'. Auth::user()->role;
 
@@ -87,9 +86,11 @@ public function getSensorStatusJson()
         $sensorStatus = [];
 
         foreach ($sensorKeys as $key => $name) {
-            $logData = data_get($tenantData, "sensor_latest_logs.$key", null);
+            $logDataRaw = Arr::get($tenantData, "sensor_latest_logs.$key");
 
-            if ($logData && is_array($logData) && count($logData) > 0) {
+            $logData = is_array($logDataRaw) ? array_values($logDataRaw) : [];
+
+            if (!empty($logData)) {
                 $latest = collect($logData)->sortByDesc('timestamp')->first();
                 $status = 'ACTIVE';
                 $timestamp = \Carbon\Carbon::parse($latest['timestamp'])->format('d M Y H:i:s');
@@ -104,6 +105,7 @@ public function getSensorStatusJson()
                 'timestamp' => $timestamp
             ];
         }
+
 
         return response()->json($sensorStatus);
     }
