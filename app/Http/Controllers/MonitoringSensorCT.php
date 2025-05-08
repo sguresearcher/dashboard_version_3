@@ -23,42 +23,42 @@ class MonitoringSensorCT extends Controller
     public function index()
     {
 
-        $response = Http::withHeaders([
-            'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
-        ])->timeout(180)->get('http://10.20.100.172:7777/summary/24h');
+        // $response = Http::withHeaders([
+        //     'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
+        // ])->timeout(180)->get('http://10.20.100.172:7777/summary/24h');
         
-        $data = $response->json();
+        // $data = $response->json();
 
-        $sensors = [
-            'conpot' => 'conpot',
-            'honeytrap' => 'honeytrap',
-            'cowrie' => 'cowrie',
-            'dionaea' => 'dionaea',
-            'rdpy' => 'rdpy',
-            'dionaea_ews' => 'dionaea_ews',
-            'elasticpot' => 'elasticpot',
-        ];
+        // $sensors = [
+        //     'conpot' => 'conpot',
+        //     'honeytrap' => 'honeytrap',
+        //     'cowrie' => 'cowrie',
+        //     'dionaea' => 'dionaea',
+        //     'rdpy' => 'rdpy',
+        //     'dionaea_ews' => 'dionaea_ews',
+        //     'elasticpot' => 'elasticpot',
+        // ];
 
-        $sensorStatus = [];
+        // $sensorStatus = [];
 
-        foreach ($sensors as $key => $name) {
-            $logData = data_get($data, "sensor_latest_logs.$key", null);
+        // foreach ($sensors as $key => $name) {
+        //     $logData = data_get($data, "sensor_latest_logs.$key", null);
     
-            if ($logData && is_array($logData) && count($logData) > 0) {
-                $latest = collect($logData)->sortByDesc('timestamp')->first();
-                $status = 'ACTIVE';
-                $timestamp = \Carbon\Carbon::parse($latest['timestamp'])->format('d M Y H:i:s');
-            } else {
-                $status = 'UNACTIVE';
-                $timestamp = null;
-            }
+        //     if ($logData && is_array($logData) && count($logData) > 0) {
+        //         $latest = collect($logData)->sortByDesc('timestamp')->first();
+        //         $status = 'ACTIVE';
+        //         $timestamp = \Carbon\Carbon::parse($latest['timestamp'])->format('d M Y H:i:s');
+        //     } else {
+        //         $status = 'UNACTIVE';
+        //         $timestamp = null;
+        //     }
     
-            $sensorStatus[] = [
-                'name' => $name,
-                'status' => $status,
-                'timestamp' => $timestamp
-            ];
-        }
+        //     $sensorStatus[] = [
+        //         'name' => $name,
+        //         'status' => $status,
+        //         'timestamp' => $timestamp
+        //     ];
+        // }
 
 
         return view('pages.monitoring-sensor');

@@ -21,6 +21,7 @@ Route::post('/logout', [LoginCT::class, 'logout']);
 
 Route::middleware(['auth','superadmin', 'revalidate'])->prefix('/superadmin')->group(function (){
     Route::get('/', [SuperadminCT::class, 'index']);
+    Route::get('/monitor', [MonitoringSensorCT::class, 'index']);
 });
 
 Route::middleware(['auth','revalidate'])->group(function(){
