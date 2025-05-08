@@ -22,46 +22,16 @@ class MonitoringSensorCT extends Controller
 
     public function index()
     {
+        if (Auth::user()->role == 'superadmin') {
 
-        // $response = Http::withHeaders([
-        //     'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
-        // ])->timeout(180)->get('http://10.20.100.172:7777/summary/24h');
+            return view('pages.monitoring-sensor-admin');
+
+        } elseif (Auth::user()->role == 'guest') {
+
+
+            return view('pages.monitoring-sensor');
+        }
         
-        // $data = $response->json();
-
-        // $sensors = [
-        //     'conpot' => 'conpot',
-        //     'honeytrap' => 'honeytrap',
-        //     'cowrie' => 'cowrie',
-        //     'dionaea' => 'dionaea',
-        //     'rdpy' => 'rdpy',
-        //     'dionaea_ews' => 'dionaea_ews',
-        //     'elasticpot' => 'elasticpot',
-        // ];
-
-        // $sensorStatus = [];
-
-        // foreach ($sensors as $key => $name) {
-        //     $logData = data_get($data, "sensor_latest_logs.$key", null);
-    
-        //     if ($logData && is_array($logData) && count($logData) > 0) {
-        //         $latest = collect($logData)->sortByDesc('timestamp')->first();
-        //         $status = 'ACTIVE';
-        //         $timestamp = \Carbon\Carbon::parse($latest['timestamp'])->format('d M Y H:i:s');
-        //     } else {
-        //         $status = 'UNACTIVE';
-        //         $timestamp = null;
-        //     }
-    
-        //     $sensorStatus[] = [
-        //         'name' => $name,
-        //         'status' => $status,
-        //         'timestamp' => $timestamp
-        //     ];
-        // }
-
-
-        return view('pages.monitoring-sensor');
     }
 
     public function getSensorStatusJson() {
