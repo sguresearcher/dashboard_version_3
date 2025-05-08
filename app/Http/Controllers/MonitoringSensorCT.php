@@ -26,7 +26,7 @@ class MonitoringSensorCT extends Controller
 
             return view('pages.monitoring-sensor-admin');
 
-        } elseif (Auth::user()->role == 'guest') {
+        } elseif (Auth::user()->role == 'tenant') {
 
 
             return view('pages.monitoring-sensor');
