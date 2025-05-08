@@ -5,6 +5,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -68,7 +69,6 @@ class MonitoringSensorCT extends Controller
         $tenantKey = 'ewsdb_' . Auth::user()->user_code;
         
         // Log tenant key yang akan digunakan
-        Log::info("Tenant Key:", ['tenantKey' => $tenantKey]);
     
         $response = Http::withHeaders([
             'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
@@ -77,18 +77,15 @@ class MonitoringSensorCT extends Controller
         $data = $response->json();
         
         // Log seluruh response API untuk melihat struktur data mentah
-        Log::info("API Response Keys:", ['keys' => array_keys($data)]);
         
         // Log khusus data tenant yang kita cari
         $tenantData = data_get($data, $tenantKey, []);
-        Log::info("Tenant Data:", ['tenantKey' => $tenantKey, 'exists' => !empty($tenantData), 'keys' => empty($tenantData) ? [] : array_keys($tenantData)]);
         
         // Jika tenant data kosong, coba lihat semua tenant yang tersedia
         if (empty($tenantData)) {
             $possibleTenants = array_filter(array_keys($data), function($key) {
                 return strpos($key, 'ewsdb_') === 0;
             });
-            Log::info("Possible tenant keys:", ['tenants' => $possibleTenants]);
         }
     
         $sensorKeys = [
@@ -103,22 +100,12 @@ class MonitoringSensorCT extends Controller
     
         // Log keberadaan sensor_latest_logs
         $sensorLogs = Arr::get($tenantData, 'sensor_latest_logs', []);
-        Log::info("Sensor Logs:", [
-            'exists' => !empty($sensorLogs), 
-            'keys' => empty($sensorLogs) ? [] : array_keys($sensorLogs)
-        ]);
     
         $sensorStatus = [];
     
         foreach ($sensorKeys as $key => $name) {
             $logDataRaw = Arr::get($sensorLogs, $key);
             
-            // Log data untuk setiap sensor
-            Log::info("Sensor {$key}:", [
-                'exists' => !empty($logDataRaw),
-                'type' => gettype($logDataRaw),
-                'data' => $logDataRaw
-            ]);
             
             // Sisanya sama seperti sebelumnya...
             if (!empty($logDataRaw)) {
@@ -152,5 +139,96 @@ class MonitoringSensorCT extends Controller
     
         return response()->json($sensorStatus);
     }
+
+    public function getSensorAllTenantStatus() {
+        // Mengambil data dari API
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
+        ])->timeout(180)->get('http://10.20.100.172:7777/summary/24h');
+    
+        $data = $response->json();
+    
+        // Log available tenant keys di API
+        $apiTenantKeys = array_keys($data);
+        Log::info("API Tenant Keys:", ['keys' => $apiTenantKeys]);
+    
+        // Array untuk menyimpan hasil status sensor per tenant
+        $allTenantSensorStatus = [];
+    
+        // Daftar sensor yang ingin dipantau
+        $sensorKeys = [
+            'conpot' => 'conpot',
+            'honeytrap' => 'honeytrap',
+            'cowrie' => 'cowrie',
+            'dionaea' => 'dionaea',
+            'rdpy' => 'rdpy',
+            'dionaea_ews' => 'dionaea_ews',
+            'elasticpot' => 'elasticpot',
+        ];
+    
+        // Loop melalui semua tenant key yang tersedia di API
+        foreach ($apiTenantKeys as $tenantKey) {
+            // Periksa apakah ini tenant yang valid (dimulai dengan 'ewsdb_')
+            if (strpos($tenantKey, 'ewsdb_') !== 0) {
+                continue; // Skip jika bukan tenant key
+            }
+    
+            $tenantData = $data[$tenantKey];
+            
+            // Periksa apakah sensor_latest_logs ada di tenant
+            if (!isset($tenantData['sensor_latest_logs'])) {
+                Log::warning("sensor_latest_logs not found:", ['tenantKey' => $tenantKey]);
+                continue; // Skip tenant tanpa sensor logs
+            }
+    
+            $sensorLogs = $tenantData['sensor_latest_logs'];
+            
+            $tenantSensorStatus = [
+                'tenant' => $tenantKey,
+                'sensors' => []
+            ];
+    
+            // Loop untuk setiap sensor
+            foreach ($sensorKeys as $key => $name) {
+                $logDataRaw = Arr::get($sensorLogs, $key);
+                
+                if (!empty($logDataRaw)) {
+                    if (is_array($logDataRaw)) {
+                        if (isset($logDataRaw[0])) {
+                            // Jika array dengan index numerik
+                            $latest = collect($logDataRaw)->sortByDesc('timestamp')->first();
+                        } else {
+                            // Jika associative array
+                            $latest = $logDataRaw;
+                        }
+                    } else {
+                        $latest = $logDataRaw;
+                    }
+                    
+                    if (isset($latest['timestamp'])) {
+                        $status = 'ACTIVE';
+                        $timestamp = \Carbon\Carbon::parse($latest['timestamp'])->format('d M Y H:i:s');
+                    } else {
+                        $status = 'UNACTIVE';
+                        $timestamp = null;
+                    }
+                } else {
+                    $status = 'UNACTIVE';
+                    $timestamp = null;
+                }
+    
+                $tenantSensorStatus['sensors'][] = [
+                    'name' => $name,
+                    'status' => $status,
+                    'timestamp' => $timestamp
+                ];
+            }
+    
+            $allTenantSensorStatus[] = $tenantSensorStatus;
+        }
+    
+        return response()->json($allTenantSensorStatus);
+    }
+    
 
 }
