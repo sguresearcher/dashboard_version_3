@@ -64,8 +64,8 @@ class MonitoringSensorCT extends Controller
     }
 
     public function getSensorStatusJson() {
-        $role = Auth::user()->role;
-        $tenantKey = 'ewsdb_' . $role;
+        // $role = Auth::user()->role;
+        $tenantKey = 'ewsdb_hp_sgu_1';
         
         // Log tenant key yang akan digunakan
         Log::info("Tenant Key:", ['tenantKey' => $tenantKey]);
