@@ -14,10 +14,11 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+
         DB::table('users')->insert([
-            'name' => 'superadmin',
-            'email' => 'duta.nugraha82@gmail.com',
-            'password' => Hash::make('123456'),
+            'name' => 'admin',
+            'email' => 'admin@cscisac.org',
+            'password' => Hash::make('AdminCscIsac23003006!'),
             'role' => 'superadmin',
             'user_code' => 'superadmin'
         ]);
