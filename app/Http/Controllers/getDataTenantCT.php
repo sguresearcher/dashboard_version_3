@@ -102,7 +102,7 @@ class getDataTenantCT extends Controller
             $total = collect($summary)->sum('total_entries');
     
             return response()->json([
-                'total_attack' => $total
+                'total_attack' => number_format($total),
             ], 200);
         } else {
             return response()->json([
@@ -346,9 +346,9 @@ class getDataTenantCT extends Controller
             $dataTenant = collect($response->json()[$tenant_code]['combined_attack'] ?? []);
     
             return response()->json([
-                'total_attack' => round($dataTenant->sum('total')),
-                'average_total_attack_per_day' => round($dataTenant->sum('total') / 24),
-                'average_total_attack_per_minute' => round($dataTenant->sum('total') / (24 * 60)),
+                'total_attack' => number_format(round($dataTenant->sum('total'))),
+                'average_total_attack_per_day' => number_format(round($dataTenant->sum('total') / 24)),
+                'average_total_attack_per_minute' => number_format(round($dataTenant->sum('total') / (24 * 60))),
             ], 200);
         } else {
             return response()->json([

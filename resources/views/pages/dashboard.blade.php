@@ -260,31 +260,6 @@
         setInterval(fetchTableDataSourceIp, 60000);
     </script>
     
-    {{-- <script>
-        function fetchAttackData() {
-            $.ajax({
-                url: '/data/guest/total-attack',
-                method: 'GET',
-                success: function(response) {
-                    if (response.total_attack !== undefined) {
-                        $('#totalAttack').text(response.total_attack.toLocaleString());
-                    } else {
-                        $('#totalAttack').text('No data');
-                    }
-                },
-                error: function() {
-                    $('#totalAttack').text('Failed to load');
-                }
-            });
-        }
-    
-        $(document).ready(function() {
-            fetchAttackData();
-    
-            setInterval(fetchAttackData, 18000000);
-        });
-    </script> --}}
-    
     <script>
     
     
