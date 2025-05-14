@@ -392,7 +392,7 @@ class getDataTenantCT extends Controller
                         'target_address' => $entry['target_address'],
                         'eventid' => $entry['protocol'],
                         'target_port' => $entry['port'],
-                        'total_attack' => $entry['total']
+                        'total_attack' => number_format($entry['total']),
                     ];
                 });
     
@@ -424,7 +424,7 @@ class getDataTenantCT extends Controller
                 ->map(function ($items, $sensor) {
                     return [
                         'sensor' => $sensor ?? 'unknown',
-                        'count' => $items->count()
+                        'count' => number_format($items->count()),
                     ];
                 })
                 ->sortByDesc('count')
@@ -467,9 +467,9 @@ class getDataTenantCT extends Controller
                     $total = $items->sum('total');
                     return [
                         'sensor' => $sensor,
-                        'average_per_hour' => round($total / 24),
-                        'total_per_day' => $total,
-                        'average_per_minute' => round($total / (24 * 60)),
+                        'average_per_hour' => number_format(round($total / 24)),
+                        'total_per_day' => number_format($total),
+                        'average_per_minute' => number_format(round($total / (24 * 60))),
                             
                         ];
                 })
