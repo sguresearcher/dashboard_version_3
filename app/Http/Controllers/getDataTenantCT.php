@@ -135,7 +135,7 @@ class getDataTenantCT extends Controller
                         'target_address' => $items->first()['target_address'],
                         'eventid' => $items->first()['protocol'],
                         'target_port' => $items->first()['port'],
-                        'total_attack' => collect($items)->sum('total')
+                        'total_attack' => number_format(collect($items)->sum('total'))
                     ];
                 })
                 ->sortByDesc('total_attack')
@@ -175,9 +175,9 @@ class getDataTenantCT extends Controller
                 ->map(function ($items, $sensor) {
                     return [
                         'sensor' => $sensor ?? 'unknown',
-                        'total' => $items->count(),
-                        'average_per_hour' => round($items->sum('total') / (24 * 60)),
-                        'average_per_day' => round($items->sum('total') / 24),
+                        'total' => number_format($items->count()),
+                        'average_per_hour' => number_format(round($items->sum('total') / (24 * 60))),
+                        'average_per_day' => number_format(round($items->sum('total') / 24)),
                     ];
                 })
                 ->sortByDesc('count')
@@ -221,9 +221,9 @@ class getDataTenantCT extends Controller
             $data = collect($sensorTotals)->map(function ($total, $sensor) use ($totalJam) {
                 return [
                     'sensor' => $sensor,
-                    'average_per_hour' => round($total / $totalJam),
-                    'total_per_day' => $total,
-                    'average_per_minute' => round($total / ($totalJam * 60)),
+                    'average_per_hour' => number_format(round($total / $totalJam)),
+                    'total_per_day' => number_format($total),
+                    'average_per_minute' => number_format(round($total / ($totalJam * 60))),
 
                 ];
             })->sortByDesc('average_per_hour')->values();
@@ -509,10 +509,10 @@ class getDataTenantCT extends Controller
             $averagePerMinute = round($totalAttack / count($summary) / $totalJam);
         
             return response()->json([
-                'average_total_attack_per_day' => $totalPerHour,
-                'total_attack' => $totalAttack,
-                'hours_counted' => $totalJam,
-                'average_total_attack_per_minute' => $averagePerMinute,
+                'average_total_attack_per_day' => number_format($totalPerHour),
+                'total_attack' => number_format($totalAttack),
+                'hours_counted' => number_format($totalJam),
+                'average_total_attack_per_minute' => number_format($averagePerMinute),
             ], 200);
         } else {
             return response()->json([
