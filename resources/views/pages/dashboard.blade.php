@@ -280,7 +280,7 @@
                     const data = response.sensor_attack?.data || [];
     
                     if (isDay && isAverage) {
-                        const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+                        const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
     
                         data.forEach(item => {
                             const sensorName = item.sensor || 'Unknown';
@@ -294,7 +294,7 @@
     
                     } else if (isDay && isTotal) {
     
-                        const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+                        const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
     
                         data.forEach(item => {
                             const sensorName = item.sensor || 'Unknown';
@@ -308,7 +308,7 @@
                         container.append(ul);
     
                     } else if (isHour && isTotal) {
-                        const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+                        const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
     
                         data.forEach(item => {
                             const sensorName = item.sensor || 'Unknown';
@@ -321,7 +321,7 @@
                         container.append(ul);
     
                     } else if (isHour && isAverage) {
-                        const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+                        const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
     
                         data.forEach(item => {
                             const sensorName = item.sensor || 'Unknown';
@@ -598,7 +598,7 @@ $(document).ready(function() {
                 const data = response.sensor_attack?.data || [];
 
                 if (isDay && isAverage) {
-                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+                    const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
 
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
@@ -612,7 +612,7 @@ $(document).ready(function() {
 
                 } else if (isDay && isTotal) {
 
-                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+                    const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
 
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
@@ -626,7 +626,7 @@ $(document).ready(function() {
                     container.append(ul);
 
                 } else if (isHour && isTotal) {
-                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+                    const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
 
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
@@ -639,7 +639,7 @@ $(document).ready(function() {
                     container.append(ul);
 
                 } else if (isHour && isAverage) {
-                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+                    const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
 
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
@@ -843,7 +843,7 @@ $(document).ready(function() {
                 const data = response.sensor_attack?.data || [];
 
                 if (isDay && isAverage) {
-                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+                    const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
 
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
@@ -857,7 +857,7 @@ $(document).ready(function() {
 
                 } else if (isDay && isTotal) {
 
-                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+                    const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
 
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
@@ -871,7 +871,7 @@ $(document).ready(function() {
                     container.append(ul);
 
                 } else if (isHour && isTotal) {
-                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+                    const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
 
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
@@ -884,7 +884,7 @@ $(document).ready(function() {
                     container.append(ul);
 
                 } else if (isHour && isAverage) {
-                    const ul = $('<ul></ul>').addClass('list-unstyled mb-0');
+                    const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
 
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
