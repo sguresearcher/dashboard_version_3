@@ -605,8 +605,8 @@ class getDataTenantCT extends Controller
         return response()->json([
             'sensor' => $sensor,
             'ip_attack_chart' => [
-                'labels' => $labels,
-                'data' => $data
+                'labels' => 'Port : ' . $labels,
+                'data' => 'Total : ' . $data
             ],
             'ip_attack_details' => $details
         ]);
