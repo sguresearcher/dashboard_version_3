@@ -45,6 +45,11 @@
 						z-index: 1;
 						background-color: #0c1c2c; /* atau sesuaikan dengan warna card kamu */
 						}
+						
+		#doughnutChartAttack {
+							max-width: 300px;
+							max-height: 300px;
+						}
 	</style>
 
 	<!-- ================== END page-css ================== -->
