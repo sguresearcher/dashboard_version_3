@@ -722,7 +722,6 @@ $(document).ready(function() {
 
 @guest
 <script>
-
 $(document).ready(function() {
     function updateDisplay() {
         const isDay = $('#showDay').is(':checked');
