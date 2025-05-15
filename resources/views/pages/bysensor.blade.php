@@ -31,10 +31,10 @@
             <div class="card-body">
                     <div class="card border-0">
                         <div class="card-body">
-                           <div style="display: flex; align-items: flex-start; gap: 30px;">
-                            <canvas id="doughnutChartAttack" width="200" height="200"></canvas>
-                            <div id="doughnutLabels" style="font-family: sans-serif; font-size: 14px;"></div>
-                        </div>
+                           <div style="display: flex; align-items: flex-start; gap: 40px;">
+                                <canvas id="doughnutChartAttack" width="300" height="300"></canvas> <!-- Ukuran diperkecil -->
+                                <div id="doughnutLabels" style="font-family: sans-serif; font-size: 14px; color: #ffffff;"></div>
+                            </div>
 
                         </div>
                     </div>
@@ -208,43 +208,46 @@
 
         // Ambil data chart dari backend
         fetch('/data/{{ $sensor }}/doughnut-chart')
-            .then(response => response.json())
-            .then(data => {
-                doughnutChart.data.labels = data.ip_attack_chart.labels;
-                doughnutChart.data.datasets[0].data = data.ip_attack_chart.data;
-                doughnutChart.update();
+        .then(response => response.json())
+        .then(data => {
+            // Update chart data
+            doughnutChart.data.labels = data.ip_attack_chart.labels;
+            doughnutChart.data.datasets[0].data = data.ip_attack_chart.data;
+            doughnutChart.update();
 
-                // Menambahkan label di samping kanan chart
-                const labelsContainer = document.getElementById('doughnutLabels');
-                labelsContainer.innerHTML = ''; // Kosongkan dulu container
+            // Buat custom label
+            const labelsContainer = document.getElementById('doughnutLabels');
+            labelsContainer.innerHTML = ''; // Bersihkan dulu
 
-                // Iterasi untuk menambahkan label baru
-                data.ip_attack_chart.labels.forEach((label, index) => {
-                    const value = data.ip_attack_chart.data[index];
-                    const labelItem = document.createElement('div');
-                    labelItem.style.display = 'flex';
-                    labelItem.style.alignItems = 'center';
-                    labelItem.style.marginBottom = '10px';
+            data.ip_attack_chart.labels.forEach((port, index) => {
+                const total = data.ip_attack_chart.data[index];
+                const labelItem = document.createElement('div');
+                labelItem.style.display = 'flex';
+                labelItem.style.alignItems = 'center';
+                labelItem.style.marginBottom = '10px';
 
-                    // Menambahkan warna kotak kecil sesuai dengan warna background chart
-                    const colorBox = document.createElement('span');
-                    colorBox.style.backgroundColor = doughnutChart.data.datasets[0].backgroundColor[index];
-                    colorBox.style.width = '20px';
-                    colorBox.style.height = '20px';
-                    colorBox.style.marginRight = '10px';
+                // Kotak warna
+                const colorBox = document.createElement('span');
+                colorBox.style.backgroundColor = doughnutChart.data.datasets[0].backgroundColor[index];
+                colorBox.style.width = '14px';
+                colorBox.style.height = '14px';
+                colorBox.style.display = 'inline-block';
+                colorBox.style.marginRight = '10px';
+                colorBox.style.borderRadius = '3px';
 
-                    // Menambahkan teks label dan total
-                    const labelText = document.createElement('span');
-                    labelText.innerText = `${label}: ${value}`;
+                // Label text
+                const labelText = document.createElement('span');
+                labelText.textContent = `Port: ${port}   Total: ${total}`;
 
-                    labelItem.appendChild(colorBox);
-                    labelItem.appendChild(labelText);
-                    labelsContainer.appendChild(labelItem);
-                });
-            })
-            .catch(error => {
-                console.error('Error loading chart data:', error);
+                labelItem.appendChild(colorBox);
+                labelItem.appendChild(labelText);
+                labelsContainer.appendChild(labelItem);
             });
+        })
+        .catch(error => {
+            console.error('Error loading chart data:', error);
+        });
+
     });
 </script>
 
