@@ -223,10 +223,11 @@ class getDataTenantCT extends Controller
                     'sensor' => $sensor,
                     'average_per_hour' => number_format(round($total / $totalJam)),
                     'total_per_day' => number_format($total),
+                    'total_raw' => $total,
                     'average_per_minute' => number_format(round($total / ($totalJam * 60))),
 
                 ];
-            })->sortBy('total_per_day')->values();
+            })->sortBy('total_raw')->values();
 
             return response()->json([
                 'sensor_attack' => [
