@@ -179,9 +179,10 @@ class getDataTenantCT extends Controller
                         'total' => number_format($items->count()),
                         'average_per_hour' => number_format(round($items->sum('total') / (24 * 60))),
                         'average_per_day' => number_format(round($items->sum('total') / 24)),
+                        'total_raw' => $items->count()
                     ];
                 })
-                ->sortByDesc('count')
+                ->sortByDesc('total_raw')
                 ->take(10)
                 ->values();
     
@@ -427,9 +428,10 @@ class getDataTenantCT extends Controller
                     return [
                         'sensor' => $sensor ?? 'unknown',
                         'count' => number_format($items->count()),
+                        'total_raw' => $items->count(),
                     ];
                 })
-                ->sortByDesc('count')
+                ->sortByDesc('total_raw')
                 ->take(10)
                 ->values();
     

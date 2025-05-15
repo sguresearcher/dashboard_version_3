@@ -465,7 +465,7 @@
 
 <script>
      function fetchTableDataSourceIp() {
-        fetch('/data/guest/top-10')
+        fetch('/data/tenant/top-10')
             .then(response => response.json())
             .then(result => {
                 const tbody = document.querySelector('#attackSourceIP tbody');
