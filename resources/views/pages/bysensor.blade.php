@@ -31,9 +31,11 @@
             <div class="card-body">
                     <div class="card border-0">
                         <div class="card-body">
-                            <div class="h-300px w-300px mx-auto">
-                                <canvas id="doughnutChartAttack"></canvas>
-                            </div>
+                           <div style="display: flex; align-items: flex-start; gap: 30px;">
+                            <canvas id="doughnutChartAttack" width="200" height="200"></canvas>
+                            <div id="doughnutLabels" style="font-family: sans-serif; font-size: 14px;"></div>
+                        </div>
+
                         </div>
                     </div>
             </div>
@@ -198,22 +200,52 @@
                 responsive: true,
                 plugins: {
                     legend: {
-                        display: false
+                        display: false, // Menonaktifkan legend default
                     }
                 }
             }
         });
 
+        // Ambil data chart dari backend
         fetch('/data/{{ $sensor }}/doughnut-chart')
             .then(response => response.json())
             .then(data => {
                 doughnutChart.data.labels = data.ip_attack_chart.labels;
                 doughnutChart.data.datasets[0].data = data.ip_attack_chart.data;
                 doughnutChart.update();
+
+                // Menambahkan label di samping kanan chart
+                const labelsContainer = document.getElementById('doughnutLabels');
+                labelsContainer.innerHTML = ''; // Kosongkan dulu container
+
+                // Iterasi untuk menambahkan label baru
+                data.ip_attack_chart.labels.forEach((label, index) => {
+                    const value = data.ip_attack_chart.data[index];
+                    const labelItem = document.createElement('div');
+                    labelItem.style.display = 'flex';
+                    labelItem.style.alignItems = 'center';
+                    labelItem.style.marginBottom = '10px';
+
+                    // Menambahkan warna kotak kecil sesuai dengan warna background chart
+                    const colorBox = document.createElement('span');
+                    colorBox.style.backgroundColor = doughnutChart.data.datasets[0].backgroundColor[index];
+                    colorBox.style.width = '20px';
+                    colorBox.style.height = '20px';
+                    colorBox.style.marginRight = '10px';
+
+                    // Menambahkan teks label dan total
+                    const labelText = document.createElement('span');
+                    labelText.innerText = `${label}: ${value}`;
+
+                    labelItem.appendChild(colorBox);
+                    labelItem.appendChild(labelText);
+                    labelsContainer.appendChild(labelItem);
+                });
             })
             .catch(error => {
                 console.error('Error loading chart data:', error);
             });
     });
 </script>
+
 @endpush

@@ -588,7 +588,7 @@ class getDataTenantCT extends Controller
         $filteredSensorData = $dataTenant->where('sensor', $sensor);
     
         // Kelompokkan dan jumlahkan berdasarkan source_address
-        $topIps = $filteredSensorData->groupBy('source_address')
+        $topIps = $filteredSensorData->groupBy('port')
             ->map(function ($items, $ip) {
                 return $items->sum('total');
             })
@@ -598,8 +598,8 @@ class getDataTenantCT extends Controller
         // Format untuk Doughnut Chart dan detail
         $labels = $topIps->keys()->values();
         $data = $topIps->values();
-        $details = $topIps->map(function ($total, $ip) {
-            return ['ip' => $ip, 'total' => $total];
+        $details = $topIps->map(function ($total, $port) {
+            return ['port' => $port, 'total' => $total];
         })->values();
     
         return response()->json([
