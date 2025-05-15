@@ -285,8 +285,12 @@
                         data.forEach(item => {
                             const sensorName = item.sensor || 'Unknown';
                             const averagePerHour = item.average_per_hour ?? 0;
-    
-                            const li = $(`<li><strong>${sensorName}</strong>: ${averagePerHour}</li>`);
+                            const li = $(`
+                                            <li style="display: flex; justify-content: space-between;">
+                                                <span>${sensorName}</span>
+                                                <span>${averagePerHour}</span>
+                                            </li>
+                                        `);
     
                             ul.append(li);
                         });
@@ -299,8 +303,12 @@
                         data.forEach(item => {
                             const sensorName = item.sensor || 'Unknown';
                             const total = item.total_per_day ?? 0;
-    
-                            const li = $(`<li><strong>${sensorName}</strong>: ${total}</li>`);
+                            const li = $(`
+                                            <li style="display: flex; justify-content: space-between;">
+                                                <span>${sensorName}</span>
+                                                <span>${total}</span>
+                                            </li>
+                                        `);
     
                             ul.append(li);
                         });
@@ -313,8 +321,12 @@
                         data.forEach(item => {
                             const sensorName = item.sensor || 'Unknown';
                             const averagePerDay = item.average_per_hour ?? 0;
-    
-                            const li = $(`<li><strong>${sensorName}</strong>: ${averagePerDay}</li>`);
+                            const li = $(`
+                                            <li style="display: flex; justify-content: space-between;">
+                                                <span>${sensorName}</span>
+                                                <span>${averagePerDay}</span>
+                                            </li>
+                                        `);
     
                             ul.append(li);
                         });
@@ -326,8 +338,12 @@
                         data.forEach(item => {
                             const sensorName = item.sensor || 'Unknown';
                             const averagePerHour = item.average_per_minute ?? 0;
-    
-                            const li = $(`<li><strong>${sensorName}</strong>: ${averagePerHour}</li>`);
+                            const li = $(`
+                                            <li style="display: flex; justify-content: space-between;">
+                                                <span>${sensorName}</span>
+                                                <span>${averagePerHour}</span>
+                                            </li>
+                                        `);
     
                             ul.append(li);
                         });
@@ -603,8 +619,12 @@ $(document).ready(function() {
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
                         const averagePerHour = item.average_per_hour ?? 0;
-
-                        const li = $(`<li><strong>${sensorName}</strong>: ${averagePerHour}</li>`);
+                        const li = $(`
+                                            <li style="display: flex; justify-content: space-between;">
+                                                <span>${sensorName}</span>
+                                                <span>${averagePerHour}</span>
+                                            </li>
+                                        `);
 
                         ul.append(li);
                     });
@@ -617,8 +637,12 @@ $(document).ready(function() {
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
                         const total = item.total_per_day ?? 0;
-
-                        const li = $(`<li><strong>${sensorName}</strong>: ${total}</li>`);
+                        const li = $(`
+                                            <li style="display: flex; justify-content: space-between;">
+                                                <span>${sensorName}</span>
+                                                <span>${total}</span>
+                                            </li>
+                                        `);
 
                         ul.append(li);
                     });
@@ -631,8 +655,12 @@ $(document).ready(function() {
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
                         const averagePerDay = item.average_per_hour ?? 0;
-
-                        const li = $(`<li><strong>${sensorName}</strong>: ${averagePerDay}</li>`);
+                        const li = $(`
+                                            <li style="display: flex; justify-content: space-between;">
+                                                <span>${sensorName}</span>
+                                                <span>${averagePerDay}</span>
+                                            </li>
+                                        `);
 
                         ul.append(li);
                     });
@@ -644,8 +672,12 @@ $(document).ready(function() {
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
                         const averagePerHour = item.average_per_minute ?? 0;
-
-                        const li = $(`<li><strong>${sensorName}</strong>: ${averagePerHour}</li>`);
+                        const li = $(`
+                                            <li style="display: flex; justify-content: space-between;">
+                                                <span>${sensorName}</span>
+                                                <span>${averagePerHour}</span>
+                                            </li>
+                                        `);
 
                         ul.append(li);
                     });
@@ -848,8 +880,12 @@ $(document).ready(function() {
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
                         const averagePerHour = item.average_per_hour ?? 0;
-
-                        const li = $(`<li><strong>${sensorName}</strong>: ${averagePerHour}</li>`);
+                        const li = $(`
+                                            <li style="display: flex; justify-content: space-between;">
+                                                <span>${sensorName}</span>
+                                                <span>${averagePerHour}</span>
+                                            </li>
+                                        `);
 
                         ul.append(li);
                     });
@@ -862,8 +898,12 @@ $(document).ready(function() {
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
                         const total = item.total_per_day ?? 0;
-
-                        const li = $(`<li><strong>${sensorName}</strong>: ${total}</li>`);
+                        const li = $(`
+                                            <li style="display: flex; justify-content: space-between;">
+                                                <span>${sensorName}</span>
+                                                <span>${total}</span>
+                                            </li>
+                                        `);
 
                         ul.append(li);
                     });
@@ -876,8 +916,12 @@ $(document).ready(function() {
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
                         const averagePerDay = item.average_per_hour ?? 0;
-
-                        const li = $(`<li><strong>${sensorName}</strong>: ${averagePerDay}</li>`);
+                        const li = $(`
+                                            <li style="display: flex; justify-content: space-between;">
+                                                <span>${sensorName}</span>
+                                                <span>${averagePerDay}</span>
+                                            </li>
+                                        `);
 
                         ul.append(li);
                     });
@@ -889,8 +933,12 @@ $(document).ready(function() {
                     data.forEach(item => {
                         const sensorName = item.sensor || 'Unknown';
                         const averagePerHour = item.average_per_minute ?? 0;
-
-                        const li = $(`<li><strong>${sensorName}</strong>: ${averagePerHour}</li>`);
+                        const li = $(`
+                                            <li style="display: flex; justify-content: space-between;">
+                                                <span>${sensorName}</span>
+                                                <span>${averagePerHour}</span>
+                                            </li>
+                                        `);
 
                         ul.append(li);
                     });
