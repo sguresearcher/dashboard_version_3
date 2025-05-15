@@ -135,10 +135,11 @@ class getDataTenantCT extends Controller
                         'target_address' => $items->first()['target_address'],
                         'eventid' => $items->first()['protocol'],
                         'target_port' => $items->first()['port'],
-                        'total_attack' => number_format(collect($items)->sum('total'))
+                        'total_attack' => number_format(collect($items)->sum('total')),
+                        'total_raw' => collect($items)->sum('total'),
                     ];
                 })
-                ->sortByDesc('total_attack')
+                ->sortByDesc('total_raw')
                 ->take(10)
                 ->values();
     
@@ -227,7 +228,7 @@ class getDataTenantCT extends Controller
                     'average_per_minute' => number_format(round($total / ($totalJam * 60))),
 
                 ];
-            })->sortBy('total_raw')->values();
+            })->sortByDesc('total_raw')->values();
 
             return response()->json([
                 'sensor_attack' => [
