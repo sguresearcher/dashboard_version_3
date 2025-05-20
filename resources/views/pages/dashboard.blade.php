@@ -875,7 +875,7 @@ $(document).ready(function() {
                     row.innerHTML = `
                             <td>${index + 1}.</td>
                             <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
-                            <td>${item.total_attack || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${displayValue || '<span style="opacity:0.5">-</span>'}</td>
                     `;
                     tbody.appendChild(row);
                 tbody.appendChild(row);
