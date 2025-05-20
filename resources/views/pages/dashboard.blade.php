@@ -1035,32 +1035,29 @@ function fetchSensorAttackCount() {
     fetch('/data/guest/get-attack-sensor-count')
         .then(response => response.json())
         .then(result => {
-            const tbody = $('#attackSensor tbody');
+            const tbody = document.querySelector('#attackSensor tbody');
             tbody.innerHTML = '';
 
-            const data = response.sensor_attack?.data || [];
+            const data = result.sensor_attack?.data || [];
 
             data.forEach((item, index) => {
-                let displayValue = '';
+                let displayValue = '-';
 
                 if (isDay && isAverage) {
-                    displayValue = item.average_per_day;
+                    displayValue = item.average_per_day ?? 0;
                 } else if (isHour && isAverage) {
-                    displayValue = item.average_per_hour;
-                } else if (isDay && isTotal || isHour && isTotal) {
-                    displayValue = item.total;
-                } else {
-                    displayValue = '-';
+                    displayValue = item.average_per_hour ?? 0;
+                } else if ((isDay && isTotal) || (isHour && isTotal)) {
+                    displayValue = item.total ?? 0;
                 }
 
-                 const row = `
-                            <tr>
-                                <td>${index + 1}.</td>
-                                <td>${item.sensor || '-'}</td>
-                                <td>${displayValue || 0}</td>
-                            </tr>
-                        `;
-                    tbody.appendChild(row);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}.</td>
+                    <td>${item.sensor || '-'}</td>
+                    <td>${displayValue}</td>
+                `;
+                tbody.appendChild(row);
 
                 if (index === 0) {
                     row.classList.add('highlight-row');
@@ -1071,16 +1068,16 @@ function fetchSensorAttackCount() {
             });
         })
         .catch(error => {
-            console.error('Error fetching top 10 data:', error);
-            document.getElementById('top10Summary').textContent = 'Failed to load data.';
+            console.error('Error fetching sensor attack count:', error);
         });
-    }
+}
 
-    fetchSensorAttackCount();
-    setInterval(fetchSensorAttackCount, 60000);
+fetchSensorAttackCount();
+setInterval(fetchSensorAttackCount, 60000);
 
-    document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
+document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
     .forEach(el => el.addEventListener('change', fetchSensorAttackCount));
+
 </script>
 {{-- <script>
     function fetchSensorAttackCount() {
