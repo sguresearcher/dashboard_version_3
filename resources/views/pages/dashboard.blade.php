@@ -804,9 +804,9 @@ $(document).ready(function() {
                 let displayValue = '';
 
                 if (isDay && isAverage) {
-                    displayValue = parseFloat(item.average_day).toFixed(2);
+                    displayValue = item.average_day;
                 } else if (isHour && isAverage) {
-                    displayValue = parseFloat(item.average_hour).toFixed(2);
+                    displayValue = item.average_hour;
                 } else if (isDay && isTotal || isHour && isTotal) {
                     displayValue = item.total_attack;
                 } else {
