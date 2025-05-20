@@ -844,7 +844,7 @@ $(document).ready(function() {
 
 
 
-    function fetchTableDataSourceIp() {
+function fetchTableDataSourceIp() {
     const isDay = document.querySelector('#showDay').checked;
     const isHour = document.querySelector('#showHour').checked;
     const isAverage = document.querySelector('#showAverage').checked;
@@ -878,7 +878,6 @@ $(document).ready(function() {
                             <td>${displayValue || '<span style="opacity:0.5">-</span>'}</td>
                     `;
                     tbody.appendChild(row);
-                tbody.appendChild(row);
 
                 if (index === 0) {
                     row.classList.add('highlight-row');
@@ -899,39 +898,6 @@ $(document).ready(function() {
 
     document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
     .forEach(el => el.addEventListener('change', fetchTableDataSourceIp));
-
-    // function fetchTableDataSourceIp() {
-    //     fetch('/data/guest/top-10')
-    //         .then(response => response.json())
-    //         .then(result => {
-    //             const tbody = document.querySelector('#attackSourceIP tbody');
-    //             tbody.innerHTML = '';
-
-    //             const data = result.total_attack?.data || [];
-
-    //             data.forEach((item, index) => {
-    //                 const row = document.createElement('tr');
-    //                 row.innerHTML = `
-    //                         <td>${index + 1}.</td>
-    //                         <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
-    //                         <td>${item.total_attack || '<span style="opacity:0.5">-</span>'}</td>
-    //                 `;
-    //                 tbody.appendChild(row);
-
-    //                 if (index === 0) {
-    //                     row.classList.add('highlight-row');
-    //                     setTimeout(() => {
-    //                         row.classList.remove('highlight-row');
-    //                     }, 10000);
-    //                 }
-    //             });
-    //         })
-    //         .catch(error => console.error('Error fetching table data:', error));
-    // }
-
-    // fetchTableDataSourceIp();
-
-    // setInterval(fetchTableDataSourceIp, 60000);
 </script>
 
 <script>
@@ -1060,6 +1026,63 @@ $(document).ready(function() {
 </script>
 
 <script>
+function fetchSensorAttackCount() {
+    const isDay = document.querySelector('#showDay').checked;
+    const isHour = document.querySelector('#showHour').checked;
+    const isAverage = document.querySelector('#showAverage').checked;
+    const isTotal = document.querySelector('#showTotal').checked;
+
+    fetch('/data/guest/get-attack-sensor-count')
+        .then(response => response.json())
+        .then(result => {
+            const tbody = $('#attackSensor tbody');
+            tbody.innerHTML = '';
+
+            const data = response.sensor_attack?.data || [];
+
+            data.forEach((item, index) => {
+                let displayValue = '';
+
+                if (isDay && isAverage) {
+                    displayValue = item.average_day;
+                } else if (isHour && isAverage) {
+                    displayValue = item.average_hour;
+                } else if (isDay && isTotal || isHour && isTotal) {
+                    displayValue = item.total_attack;
+                } else {
+                    displayValue = '-';
+                }
+
+                 const row = `
+                            <tr>
+                                <td>${index + 1}.</td>
+                                <td>${item.sensor || '-'}</td>
+                                <td>${displayValue || 0}</td>
+                            </tr>
+                        `;
+                    tbody.appendChild(row);
+
+                if (index === 0) {
+                    row.classList.add('highlight-row');
+                    setTimeout(() => {
+                        row.classList.remove('highlight-row');
+                    }, 10000);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching top 10 data:', error);
+            document.getElementById('top10Summary').textContent = 'Failed to load data.';
+        });
+    }
+
+    fetchSensorAttackCount();
+    setInterval(fetchSensorAttackCount, 60000);
+
+    document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
+    .forEach(el => el.addEventListener('change', fetchSensorAttackCount));
+</script>
+{{-- <script>
     function fetchSensorAttackCount() {
         $.ajax({
             url: '/data/guest/get-attack-sensor-count',
@@ -1095,6 +1118,6 @@ $(document).ready(function() {
         fetchSensorAttackCount();
         setInterval(fetchSensorAttackCount, 18000000); 
     });
-</script>
+</script> --}}
 @endguest
 @endpush
