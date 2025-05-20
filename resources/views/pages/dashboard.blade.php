@@ -1044,11 +1044,11 @@ function fetchSensorAttackCount() {
                 let displayValue = '';
 
                 if (isDay && isAverage) {
-                    displayValue = item.average_day;
+                    displayValue = item.average_per_day;
                 } else if (isHour && isAverage) {
-                    displayValue = item.average_hour;
+                    displayValue = item.average_per_hour;
                 } else if (isDay && isTotal || isHour && isTotal) {
-                    displayValue = item.total_attack;
+                    displayValue = item.total;
                 } else {
                     displayValue = '-';
                 }
