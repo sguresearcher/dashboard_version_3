@@ -137,6 +137,8 @@ class getDataTenantCT extends Controller
                         'target_port' => $items->first()['port'],
                         'total_attack' => number_format(collect($items)->sum('total')),
                         'total_raw' => collect($items)->sum('total'),
+                        'average_day' => collect($items)->sum('total') / 24,
+                        'average_hour' => collect($items)->sum('total') / (24 * 60),
                     ];
                 })
                 ->sortByDesc('total_raw')

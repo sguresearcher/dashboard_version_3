@@ -786,39 +786,62 @@ $(document).ready(function() {
 });
 
 
-    function fetchTableData() {
-        fetch('/data/guest/top-10')
-            .then(response => response.json())
-            .then(result => {
-                const tbody = document.querySelector('#top10IpAttacker tbody');
-                tbody.innerHTML = '';
+   function fetchTableData() {
+    const isDay = document.querySelector('#showDay').checked;
+    const isHour = document.querySelector('#showHour').checked;
+    const isAverage = document.querySelector('#showAverage').checked;
+    const isTotal = document.querySelector('#showTotal').checked;
 
-                const data = result.total_attack?.data || [];
+    fetch('/data/guest/top-10')
+        .then(response => response.json())
+        .then(result => {
+            const tbody = document.querySelector('#top10IpAttacker tbody');
+            tbody.innerHTML = '';
 
-                data.forEach((item, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                            <td>${index + 1}.</td>
-                            <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
-                            <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
-                            <td>${item.total_attack || '<span style="opacity:0.5">-</span>'}</td>
-                    `;
-                    tbody.appendChild(row);
+            const data = result.total_attack?.data || [];
 
-                    if (index === 0) {
-                        row.classList.add('highlight-row');
-                        setTimeout(() => {
-                            row.classList.remove('highlight-row');
-                        }, 10000);
-                    }
-                });
-            })
-            .catch(error => console.error('Error fetching table data:', error));
+            data.forEach((item, index) => {
+                let displayValue = '';
+
+                if (isDay && isAverage) {
+                    displayValue = parseFloat(item.average_day).toFixed(2);
+                } else if (isHour && isAverage) {
+                    displayValue = parseFloat(item.average_hour).toFixed(2);
+                } else if (isDay && isTotal || isHour && isTotal) {
+                    displayValue = item.total_attack;
+                } else {
+                    displayValue = '-';
+                }
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}.</td>
+                    <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
+                    <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
+                    <td>${displayValue}</td>
+                `;
+                tbody.appendChild(row);
+
+                if (index === 0) {
+                    row.classList.add('highlight-row');
+                    setTimeout(() => {
+                        row.classList.remove('highlight-row');
+                    }, 10000);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching top 10 data:', error);
+            document.getElementById('top10Summary').textContent = 'Failed to load data.';
+        });
     }
 
     fetchTableData();
-
     setInterval(fetchTableData, 60000);
+
+    document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
+    .forEach(el => el.addEventListener('change', fetchTableData));
+
 
 
     function fetchTableDataSourceIp() {
