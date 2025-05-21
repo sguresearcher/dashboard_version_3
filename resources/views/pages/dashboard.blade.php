@@ -524,62 +524,65 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
 
 <script>
     function fetchSensorAttackCountTenant() {
-    const isDay = document.querySelector('#showDay').checked;
-    const isHour = document.querySelector('#showHour').checked;
-    const isAverage = document.querySelector('#showAverage').checked;
-    const isTotal = document.querySelector('#showTotal').checked;
+        const isDay = document.querySelector('#showDay').checked;
+        const isHour = document.querySelector('#showHour').checked;
+        const isAverage = document.querySelector('#showAverage').checked;
+        const isTotal = document.querySelector('#showTotal').checked;
 
-    fetch('/data/tenant/get-attack-sensor-count')
-        .then(response => response.json())
-        .then(result => {
-            // const tbody = $('#attackSensor tbody');
-            const tbody = document.querySelector('#attackSensor tbody');
-            tbody.innerHTML = '';
+        fetch('/data/tenant/get-attack-sensor-count')
+            .then(response => response.json())
+            .then(result => {
+                const tbody = document.querySelector('#attackSensor tbody');
+                tbody.innerHTML = '';
 
-            const data = response.sensor_attack?.data || [];
-            console.log(data);
-            
-            data.forEach((item, index) => {
-                let displayValue = '';
+                const data = result.sensor_attack?.data || [];
+                console.log(data);
 
-                if (isDay && isAverage) {
-                    displayValue = item.average_per_day;
-                } else if (isHour && isAverage) {
-                    displayValue = item.average_per_hour;
-                } else if (isDay && isTotal || isHour && isTotal) {
-                    displayValue = item.total;
-                } else {
-                    displayValue = '-';
-                }
+                data.forEach((item, index) => {
+                    let displayValue = '';
 
-                const row = `
-                            <tr>
-                                <td>${index + 1}.</td>
-                                <td>${item.sensor || '-'}</td>
-                                <td>${item.displayValue || 0}</td>
-                            </tr>
-                        `;
-                tbody.appendChild(row);
+                    if (isDay && isAverage) {
+                        displayValue = item.average_per_day;
+                    } else if (isHour && isAverage) {
+                        displayValue = item.average_per_hour;
+                    } else if ((isDay && isTotal) || (isHour && isTotal)) {
+                        displayValue = item.total;
+                    } else {
+                        displayValue = '-';
+                    }
 
-                if (index === 0) {
-                    row.classList.add('highlight-row');
-                    setTimeout(() => {
-                        row.classList.remove('highlight-row');
-                    }, 10000);
-                }
+                    const row = `
+                        <tr>
+                            <td>${index + 1}.</td>
+                            <td>${item.sensor || '-'}</td>
+                            <td>${displayValue || 0}</td>
+                        </tr>
+                    `;
+                    tbody.insertAdjacentHTML('beforeend', row);
+
+                    if (index === 0) {
+                        const firstRow = tbody.querySelector('tr');
+                        if (firstRow) {
+                            firstRow.classList.add('highlight-row');
+                            setTimeout(() => {
+                                firstRow.classList.remove('highlight-row');
+                            }, 10000);
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching top 10 data:', error);
             });
-        })
-        .catch(error => {
-            console.error('Error fetching top 10 data:', error);
-        });
     }
 
     fetchSensorAttackCountTenant();
     setInterval(fetchSensorAttackCountTenant, 60000);
 
     document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
-    .forEach(el => el.addEventListener('change', fetchSensorAttackCountTenant));
+        .forEach(el => el.addEventListener('change', fetchSensorAttackCountTenant));
 </script>
+
 
 
 <script>
