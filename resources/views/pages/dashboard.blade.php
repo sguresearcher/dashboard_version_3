@@ -666,27 +666,37 @@ $(document).ready(function () {
     });
   }
 
-  // Fungsi untuk render list attack sensor average / total
-  function renderSensorList(container, data, getValueFunc) {
-    container.empty();
-    if (!data.length) {
-      container.text('No data to show');
-      return;
-    }
-    const ul = $('<ul>').addClass('list-unstyled mb-0').css('text-align', 'right');
-    data.forEach(item => {
-      const sensorName = item.sensor || 'Unknown';
-      const value = getValueFunc(item);
-      const li = $('<li>').css({
-        display: 'flex',
-        'justify-content': 'space-between',
-      });
-      li.append($('<span>').text(sensorName));
-      li.append($('<span>').text(value));
-      ul.append(li);
+  function renderSensorList(tbodySelector, data, columns, displayValueFn) {
+  const tbody = $(tbodySelector);
+  tbody.empty();
+
+  data.forEach((item, index) => {
+    const row = $('<tr>');
+
+    row.append(`<td>${index + 1}.</td>`);
+    
+    columns.forEach(col => {
+      if (typeof col === 'string') {
+        const val = item[col] || '<span style="opacity:0.5">-</span>';
+        row.append(`<td>${val}</td>`);
+      } else if (typeof col === 'function') {
+        row.append(`<td>${col(item)}</td>`);
+      }
     });
-    container.append(ul);
-  }
+
+    if (displayValueFn) {
+      row.append(`<td>${displayValueFn(item)}</td>`);
+    }
+
+    tbody.append(row);
+
+    if (index === 0) {
+      row.addClass('highlight-row');
+      setTimeout(() => row.removeClass('highlight-row'), 10000);
+    }
+  });
+}
+
 
   // Fungsi update display total attack (top number)
   function updateDisplay() {
@@ -750,53 +760,44 @@ $(document).ready(function () {
     });
   }
 
-  // Fetch data dan render top 10 IP attacker
   function fetchTableData() {
-    const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
+  const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
-    $.getJSON('/data/guest/top-10', function (result) {
-      const data = result.total_attack?.data || [];
+  $.getJSON('/data/guest/top-10', function(result) {
+    const data = result.total_attack?.data || [];
 
-      renderTable(
-        '#top10IpAttacker',
-        data,
-        item => {
-          if (isDay && isAverage) return item.average_day || '-';
-          if (isHour && isAverage) return item.average_hour || '-';
-          if ((isDay && isTotal) || (isHour && isTotal)) return item.total_attack || '-';
-          return '-';
-        },
-        item => item.eventid || '<span style="opacity:0.5">-</span>'
-      );
-    }).fail(() => {
-      $('#top10Summary').text('Failed to load data.');
-    });
-  }
+    const displayValueFn = item => {
+      if (isDay && isAverage) return item.average_day || '-';
+      if (isHour && isAverage) return item.average_hour || '-';
+      if ((isDay && isTotal) || (isHour && isTotal)) return item.total_attack || '-';
+      return '-';
+    };
 
-  // Fetch data dan render attack source IP
-  function fetchTableDataSourceIp() {
-    const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
+    renderSensorList('#top10IpAttacker tbody', data, ['eventid', 'target_port'], displayValueFn);
+  }).fail(() => {
+    $('#top10Summary').text('Failed to load data.');
+  });
+}
 
-    $.getJSON('/data/guest/top-10', function (result) {
-      const data = result.total_attack?.data || [];
+function fetchTableDataSourceIp() {
+  const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
-      renderTable(
-        '#attackSourceIP',
-        data,
-        item => {
-          if (isDay && isAverage) return item.average_day || '-';
-          if (isHour && isAverage) return item.average_hour || '-';
-          if ((isDay && isTotal) || (isHour && isTotal)) return item.total_attack || '-';
-          return '-';
-        },
-        item => item.source_address || '<span style="opacity:0.5">-</span>'
-      );
-    }).fail(() => {
-      $('#top10Summary').text('Failed to load data.');
-    });
-  }
+  $.getJSON('/data/guest/top-10', function(result) {
+    const data = result.total_attack?.data || [];
 
-  // Update attack sensor average/total list
+    const displayValueFn = item => {
+      if (isDay && isAverage) return item.average_day || '-';
+      if (isHour && isAverage) return item.average_hour || '-';
+      if ((isDay && isTotal) || (isHour && isTotal)) return item.total_attack || '-';
+      return '-';
+    };
+
+    renderSensorList('#attackSourceIP tbody', data, ['source_address'], displayValueFn);
+  }).fail(() => {
+    $('#top10Summary').text('Failed to load data.');
+  });
+}
+
   function updateAverage() {
     const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
@@ -1219,7 +1220,5 @@ setInterval(fetchSensorAttackCount, 60000);
 
 document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
     .forEach(el => el.addEventListener('change', fetchSensorAttackCount)); --}}
-
-</script>
 @endguest
 @endpush
