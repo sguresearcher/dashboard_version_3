@@ -831,11 +831,6 @@ $(document).ready(function () {
           
           const li = $(`<li style="display: flex; justify-content: space-between;"><span>${label}</span><span>${value}</span></li>`);
           ul.append(li);
-          
-          if (index === 0) {
-            li.addClass('highlight-row');
-            setTimeout(() => li.removeClass('highlight-row'), 10000);
-          }
         });
         
         container.append(ul);
