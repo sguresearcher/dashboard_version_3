@@ -535,7 +535,7 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
             const tbody = $('#attackSensor tbody');
             tbody.innerHTML = '';
 
-            const data = result.total_attack?.data || [];
+            const data = response.sensor_attack?.data || [];
 
             data.forEach((item, index) => {
                 let displayValue = '';
