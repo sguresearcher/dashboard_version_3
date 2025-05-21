@@ -609,12 +609,10 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
                         displayValue = '-';
                     }
 
-                    const row = `
-                        <tr>
+                   row.innerHTML = `
                             <td>${index + 1}.</td>
-                            <td>${item.sensor || '-'}</td>
-                            <td>${displayValue || 0}</td>
-                        </tr>
+                            <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${displayValue || '<span style="opacity:0.5">-</span>'}</td>
                     `;
                     tbody.insertAdjacentHTML('beforeend', row);
 
