@@ -429,7 +429,9 @@ class getDataTenantCT extends Controller
                 ->map(function ($items, $sensor) {
                     return [
                         'sensor' => $sensor ?? 'unknown',
-                        'count' => number_format($items->count()),
+                        'total' => number_format($items->count()),
+                        'average_per_day' => number_format($items->count() / 24),
+                        'average_per_hour' => number_format($items->count() / (24 * 60)),
                         'total_raw' => $items->count(),
                     ];
                 })
