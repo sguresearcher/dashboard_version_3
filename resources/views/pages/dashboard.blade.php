@@ -795,7 +795,7 @@ $(document).ready(function () {
     });
   }
 
-  // Modified updateAverage function to work with a div instead of a table
+  // Updated updateAverage function to display data as a list similar to your example
   function updateAverage() {
     const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
@@ -805,52 +805,43 @@ $(document).ready(function () {
       success: function (response) {
         const data = response.sensor_attack?.data || [];
         const container = $('#totalAttackAverage');
+        container.empty();
         
         if (!data.length) {
           container.html('<p>No data to show</p>');
           return;
         }
 
-        // Create a table dynamically
-        const table = $('<table class="table table-striped">');
-        const thead = $('<thead>').appendTo(table);
-        const headerRow = $('<tr>').appendTo(thead);
-        $('<th>').text('No.').appendTo(headerRow);
-        $('<th>').text('Sensor').appendTo(headerRow);
-        $('<th>').text('Value').appendTo(headerRow);
-        
-        const tbody = $('<tbody>').appendTo(table);
+        // Create an unstyled list with right alignment
+        const ul = $('<ul class="list-unstyled mb-0" style="text-align: right"></ul>');
         
         data.forEach((item, index) => {
-          const row = $('<tr>');
-          row.append(`<td>${index + 1}.</td>`);
-          row.append(`<td>${item.sensor || '<span style="opacity:0.5">-</span>'}</td>`);
-          
+          const label = item.sensor || 'Unknown';
           let value = '-';
+          
           if (isDay && isAverage) {
-            value = item.average_per_hour ?? '-';
+            value = item.average_per_hour ?? 0;
           } else if (isDay && isTotal) {
-            value = item.total_per_day ?? '-';
+            value = item.total_per_day ?? 0;
           } else if (isHour && isTotal) {
-            value = item.average_per_hour ?? '-';
+            value = item.average_per_hour ?? 0;
           } else if (isHour && isAverage) {
-            value = item.average_per_minute ?? '-';
+            value = item.average_per_minute ?? 0;
           }
           
-          row.append(`<td>${value}</td>`);
-          tbody.append(row);
+          const li = $(`<li style="display: flex; justify-content: space-between;"><span>${label}</span><span>${value}</span></li>`);
+          ul.append(li);
           
           if (index === 0) {
-            row.addClass('highlight-row');
-            setTimeout(() => row.removeClass('highlight-row'), 10000);
+            li.addClass('highlight-row');
+            setTimeout(() => li.removeClass('highlight-row'), 10000);
           }
         });
         
-        // Clear the container and append the table
-        container.empty().append(table);
+        container.append(ul);
       },
       error: function () {
-        $('#totalAttackAverage').html('<p>Failed to load data</p>');
+        $('#totalAttackAverage').text('Failed to load');
       },
     });
   }
