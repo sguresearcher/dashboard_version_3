@@ -548,38 +548,6 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
 
 
 <script>
-    //  function fetchTableDataSourceIp() {
-    //     fetch('/data/tenant/top-10')
-    //         .then(response => response.json())
-    //         .then(result => {
-    //             const tbody = document.querySelector('#attackSourceIP tbody');
-    //             tbody.innerHTML = '';
-
-    //             const data = result.total_attack?.data || [];
-
-    //             data.forEach((item, index) => {
-    //                 const row = document.createElement('tr');
-    //                 row.innerHTML = `
-    //                         <td>${index + 1}.</td>
-    //                         <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
-    //                         <td>${item.total_attack || '<span style="opacity:0.5">-</span>'}</td>
-    //                 `;
-    //                 tbody.appendChild(row);
-
-    //                 if (index === 0) {
-    //                     row.classList.add('highlight-row');
-    //                     setTimeout(() => {
-    //                         row.classList.remove('highlight-row');
-    //                     }, 10000);
-    //                 }
-    //             });
-    //         })
-    //         .catch(error => console.error('Error fetching table data:', error));
-    // }
-
-    // fetchTableDataSourceIp();
-
-    // setInterval(fetchTableDataSourceIp, 60000);
 
     function fetchTableDataSourceIp() {
         const isDay = document.querySelector('#showDay').checked;
@@ -641,6 +609,11 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
 
 
     function fetchTableData() {
+        const isDay = document.querySelector('#showDay').checked;
+        const isHour = document.querySelector('#showHour').checked;
+        const isAverage = document.querySelector('#showAverage').checked;
+        const isTotal = document.querySelector('#showTotal').checked;
+
         fetch('/data/tenant/top-10')
             .then(response => response.json())
             .then(result => {
@@ -648,31 +621,84 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
                 tbody.innerHTML = '';
 
                 const data = result.total_attack?.data || [];
+                console.log(data);
 
                 data.forEach((item, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+                    let displayValue = '';
+
+                    if (isDay && isAverage) {
+                        displayValue = item.average_per_day;
+                    } else if (isHour && isAverage) {
+                        displayValue = item.average_per_hour;
+                    } else if ((isDay && isTotal) || (isHour && isTotal)) {
+                        displayValue = item.total_attack;
+                    } else {
+                        displayValue = '-';
+                    }
+
+                    const row = `
                             <td>${index + 1}.</td>
                             <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
-                            <td>${item.total_attack || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${item.displayValue || '<span style="opacity:0.5">-</span>'}</td>
                     `;
-                    tbody.appendChild(row);
+                    tbody.insertAdjacentHTML('beforeend', row);
 
                     if (index === 0) {
-                        row.classList.add('highlight-row');
-                        setTimeout(() => {
-                            row.classList.remove('highlight-row');
-                        }, 10000);
+                        const firstRow = tbody.querySelector('tr');
+                        if (firstRow) {
+                            firstRow.classList.add('highlight-row');
+                            setTimeout(() => {
+                                firstRow.classList.remove('highlight-row');
+                            }, 10000);
+                        }
                     }
                 });
             })
-            .catch(error => console.error('Error fetching table data:', error));
+            .catch(error => {
+                console.error('Error fetching top 10 data:', error);
+            });
     }
 
     fetchTableData();
-
     setInterval(fetchTableData, 60000);
+
+    document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
+        .forEach(el => el.addEventListener('change', fetchTableData));
+
+    // function fetchTableData() {
+    //     fetch('/data/tenant/top-10')
+    //         .then(response => response.json())
+    //         .then(result => {
+    //             const tbody = document.querySelector('#top10IpAttacker tbody');
+    //             tbody.innerHTML = '';
+
+    //             const data = result.total_attack?.data || [];
+
+    //             data.forEach((item, index) => {
+    //                 const row = document.createElement('tr');
+    //                 row.innerHTML = `
+    //                         <td>${index + 1}.</td>
+    //                         <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
+    //                         <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
+    //                         <td>${item.total_attack || '<span style="opacity:0.5">-</span>'}</td>
+    //                 `;
+    //                 tbody.appendChild(row);
+
+    //                 if (index === 0) {
+    //                     row.classList.add('highlight-row');
+    //                     setTimeout(() => {
+    //                         row.classList.remove('highlight-row');
+    //                     }, 10000);
+    //                 }
+    //             });
+    //         })
+    //         .catch(error => console.error('Error fetching table data:', error));
+    // }
+
+    // fetchTableData();
+
+    // setInterval(fetchTableData, 60000);
 </script>
 
 <script>
