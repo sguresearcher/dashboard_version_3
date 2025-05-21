@@ -798,37 +798,57 @@ function fetchTableDataSourceIp() {
   });
 }
 
-  function updateAverage() {
-  const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
+function updateAverage() {
+        const { isDay, isHour, isAverage, isTotal } = getSelectedView();
+        $.getJSON('/data/guest/get-attack-sensor-average', function (response) {
+            const container = $('#totalAttackAverage');
+            container.empty();
+            const data = response.sensor_attack?.data || [];
+            const ul = $('<ul class="list-unstyled mb-0" style="text-align: right"></ul>');
+            data.forEach(item => {
+                const label = item.sensor || 'Unknown';
+                let value = '-';
+                if (isDay && isAverage) value = item.average_per_hour ?? 0;
+                else if (isDay && isTotal) value = item.total_per_day ?? 0;
+                else if (isHour && isTotal) value = item.average_per_hour ?? 0;
+                else if (isHour && isAverage) value = item.average_per_minute ?? 0;
+                ul.append(`<li style="display: flex; justify-content: space-between;"><span>${label}</span><span>${value}</span></li>`);
+            });
+            container.append(ul);
+        }).fail(() => $('#totalAttackAverage').text('Failed to load'));
+    }
 
-  $.ajax({
-    url: '/data/guest/get-attack-sensor-average',
-    method: 'GET',
-    success: function (response) {
-      const data = response.sensor_attack?.data || [];
+//   function updateAverage() {
+//   const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
-      if (!data.length) {
-        $('#totalAttackAverageTable tbody').empty().append('<tr><td colspan="2">No data to show</td></tr>');
-        return;
-      }
+//   $.ajax({
+//     url: '/data/guest/get-attack-sensor-average',
+//     method: 'GET',
+//     success: function (response) {
+//       const data = response.sensor_attack?.data || [];
 
-      if (isDay && isAverage) {
-        renderSensorList('#totalAttackAverageTable tbody', data, ['sensor'], item => item.average_per_hour ?? '-');
-      } else if (isDay && isTotal) {
-        renderSensorList('#totalAttackAverageTable tbody', data, ['sensor'], item => item.total_per_day ?? '-');
-      } else if (isHour && isTotal) {
-        renderSensorList('#totalAttackAverageTable tbody', data, ['sensor'], item => item.average_per_hour ?? '-');
-      } else if (isHour && isAverage) {
-        renderSensorList('#totalAttackAverageTable tbody', data, ['sensor'], item => item.average_per_minute ?? '-');
-      } else {
-        $('#totalAttackAverageTable tbody').empty().append('<tr><td colspan="2">No data to show</td></tr>');
-      }
-    },
-    error: function () {
-      $('#totalAttackAverageTable tbody').empty().append('<tr><td colspan="2">Failed to load</td></tr>');
-    },
-  });
-}
+//       if (!data.length) {
+//         $('#totalAttackAverageTable tbody').empty().append('<tr><td colspan="2">No data to show</td></tr>');
+//         return;
+//       }
+
+//       if (isDay && isAverage) {
+//         renderSensorList('#totalAttackAverageTable tbody', data, ['sensor'], item => item.average_per_hour ?? '-');
+//       } else if (isDay && isTotal) {
+//         renderSensorList('#totalAttackAverageTable tbody', data, ['sensor'], item => item.total_per_day ?? '-');
+//       } else if (isHour && isTotal) {
+//         renderSensorList('#totalAttackAverageTable tbody', data, ['sensor'], item => item.average_per_hour ?? '-');
+//       } else if (isHour && isAverage) {
+//         renderSensorList('#totalAttackAverageTable tbody', data, ['sensor'], item => item.average_per_minute ?? '-');
+//       } else {
+//         $('#totalAttackAverageTable tbody').empty().append('<tr><td colspan="2">No data to show</td></tr>');
+//       }
+//     },
+//     error: function () {
+//       $('#totalAttackAverageTable tbody').empty().append('<tr><td colspan="2">Failed to load</td></tr>');
+//     },
+//   });
+// }
 
 
   // Fetch sensor attack count
