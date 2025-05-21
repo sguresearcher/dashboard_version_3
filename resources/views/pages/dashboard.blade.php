@@ -484,7 +484,7 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
 
 </script>
 @else
-<script>
+{{-- <script>
     function fetchSensorAttackCountTenant() {
         $.ajax({
             url: '/data/tenant/get-attack-sensor-count',
@@ -520,6 +520,63 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
         fetchSensorAttackCountTenant();
         setInterval(fetchSensorAttackCountTenant, 18000000); 
     });
+</script> --}}
+
+<script>
+    function fetchSensorAttackCountTenant() {
+    const isDay = document.querySelector('#showDay').checked;
+    const isHour = document.querySelector('#showHour').checked;
+    const isAverage = document.querySelector('#showAverage').checked;
+    const isTotal = document.querySelector('#showTotal').checked;
+
+    fetch('/data/tenant/get-attack-sensor-count')
+        .then(response => response.json())
+        .then(result => {
+            const tbody = $('#attackSensor tbody');
+            tbody.innerHTML = '';
+
+            const data = result.total_attack?.data || [];
+
+            data.forEach((item, index) => {
+                let displayValue = '';
+
+                if (isDay && isAverage) {
+                    displayValue = item.average_per_day;
+                } else if (isHour && isAverage) {
+                    displayValue = item.average_per_hour;
+                } else if (isDay && isTotal || isHour && isTotal) {
+                    displayValue = item.total_attack;
+                } else {
+                    displayValue = '-';
+                }
+
+                const row = `
+                            <tr>
+                                <td>${index + 1}.</td>
+                                <td>${item.sensor || '-'}</td>
+                                <td>${item.displayValue || 0}</td>
+                            </tr>
+                        `;
+                tbody.appendChild(row);
+
+                if (index === 0) {
+                    row.classList.add('highlight-row');
+                    setTimeout(() => {
+                        row.classList.remove('highlight-row');
+                    }, 10000);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching top 10 data:', error);
+        });
+    }
+
+    fetchSensorAttackCountTenant();
+    setInterval(fetchSensorAttackCountTenant, 60000);
+
+    document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
+    .forEach(el => el.addEventListener('change', fetchSensorAttackCountTenant));
 </script>
 
 
