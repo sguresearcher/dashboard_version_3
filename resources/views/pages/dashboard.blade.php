@@ -545,7 +545,7 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
                 } else if (isHour && isAverage) {
                     displayValue = item.average_per_hour;
                 } else if (isDay && isTotal || isHour && isTotal) {
-                    displayValue = item.total_attack;
+                    displayValue = item.total;
                 } else {
                     displayValue = '-';
                 }
