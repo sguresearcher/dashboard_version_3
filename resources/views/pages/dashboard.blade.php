@@ -640,7 +640,7 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
                             <td>${index + 1}.</td>
                             <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
-                            <td>${item.displayValue || '<span style="opacity:0.5">-</span>'}</td>
+                            <td>${displayValue || '<span style="opacity:0.5">-</span>'}</td>
                     `;
                     tbody.insertAdjacentHTML('beforeend', row);
 
