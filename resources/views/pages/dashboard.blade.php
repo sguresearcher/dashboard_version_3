@@ -537,7 +537,8 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
             tbody.innerHTML = '';
 
             const data = response.sensor_attack?.data || [];
-
+            console.log(data);
+            
             data.forEach((item, index) => {
                 let displayValue = '';
 
