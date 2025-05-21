@@ -626,190 +626,245 @@ $(document).ready(function () {
 
     enforceCheckboxExclusivity();
 });
-//     function fetchSensorAttackCountTenant() {
-//         const isDay = document.querySelector('#showDay').checked;
-//         const isHour = document.querySelector('#showHour').checked;
-//         const isAverage = document.querySelector('#showAverage').checked;
-//         const isTotal = document.querySelector('#showTotal').checked;
+</script>
+@endauth
+@endif
 
-//         fetch('/data/tenant/get-attack-sensor-count')
-//             .then(response => response.json())
-//             .then(result => {
-//                 const tbody = document.querySelector('#attackSensor tbody');
-//                 tbody.innerHTML = '';
+@guest
+<script>
+    $(document).ready(function () {
+  // Helper untuk baca status checkbox
+  function getCheckboxStatus() {
+    return {
+      isDay: $('#showDay').is(':checked'),
+      isHour: $('#showHour').is(':checked'),
+      isAverage: $('#showAverage').is(':checked'),
+      isTotal: $('#showTotal').is(':checked'),
+    };
+  }
 
-//                 const data = result.sensor_attack?.data || [];
-//                 console.log(data);
+  // Fungsi agar checkbox eksklusif
+  function setupCheckboxExclusivity() {
+    $('#showAverage').change(function () {
+      if (this.checked) $('#showTotal').prop('checked', false);
+      triggerAllUpdates();
+    });
 
-//                 data.forEach((item, index) => {
-//                     let displayValue = '';
+    $('#showTotal').change(function () {
+      if (this.checked) $('#showAverage').prop('checked', false);
+      triggerAllUpdates();
+    });
 
-//                     if (isDay && isAverage) {
-//                         displayValue = item.average_per_day;
-//                     } else if (isHour && isAverage) {
-//                         displayValue = item.average_per_hour;
-//                     } else if ((isDay && isTotal) || (isHour && isTotal)) {
-//                         displayValue = item.total;
-//                     } else {
-//                         displayValue = '-';
-//                     }
+    $('#showHour').change(function () {
+      if (this.checked) $('#showDay').prop('checked', false);
+      triggerAllUpdates();
+    });
 
-//                     const row = `
-//                         <tr>
-//                             <td>${index + 1}.</td>
-//                             <td>${item.sensor || '-'}</td>
-//                             <td>${displayValue || 0}</td>
-//                         </tr>
-//                     `;
-//                     tbody.insertAdjacentHTML('beforeend', row);
+    $('#showDay').change(function () {
+      if (this.checked) $('#showHour').prop('checked', false);
+      triggerAllUpdates();
+    });
+  }
 
-//                     if (index === 0) {
-//                         const firstRow = tbody.querySelector('tr');
-//                         if (firstRow) {
-//                             firstRow.classList.add('highlight-row');
-//                             setTimeout(() => {
-//                                 firstRow.classList.remove('highlight-row');
-//                             }, 10000);
-//                         }
-//                     }
-//                 });
-//             })
-//             .catch(error => {
-//                 console.error('Error fetching top 10 data:', error);
-//             });
-//     }
+  // Fungsi untuk render list attack sensor average / total
+  function renderSensorList(container, data, getValueFunc) {
+    container.empty();
+    if (!data.length) {
+      container.text('No data to show');
+      return;
+    }
+    const ul = $('<ul>').addClass('list-unstyled mb-0').css('text-align', 'right');
+    data.forEach(item => {
+      const sensorName = item.sensor || 'Unknown';
+      const value = getValueFunc(item);
+      const li = $('<li>').css({
+        display: 'flex',
+        'justify-content': 'space-between',
+      });
+      li.append($('<span>').text(sensorName));
+      li.append($('<span>').text(value));
+      ul.append(li);
+    });
+    container.append(ul);
+  }
 
-//     fetchSensorAttackCountTenant();
-//     setInterval(fetchSensorAttackCountTenant, 60000);
+  // Fungsi update display total attack (top number)
+  function updateDisplay() {
+    const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
-//     document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
-//         .forEach(el => el.addEventListener('change', fetchSensorAttackCountTenant));
-// </script>
+    $.ajax({
+      url: 'data/guest/get-total-attack-sensor-average',
+      method: 'GET',
+      success: function (response) {
+        const container = $('#totalAttack');
+        container.empty();
 
+        let value = null;
 
+        if (isDay && isAverage) {
+          value = response.average_total_attack_per_day;
+        } else if (isDay && isTotal) {
+          value = response.total_attack;
+        } else if (isHour && isTotal) {
+          value = response.average_total_attack_per_day;
+        } else if (isHour && isAverage) {
+          value = response.average_total_attack_per_minute;
+        }
 
-// <script>
+        if (value !== null) {
+          container.text(value);
+        } else {
+          container.text('No data to show');
+        }
+      },
+      error: function () {
+        $('#totalAttack').text('Failed to load');
+      },
+    });
+  }
 
-//     function fetchTableDataSourceIp() {
-//         const isDay = document.querySelector('#showDay').checked;
-//         const isHour = document.querySelector('#showHour').checked;
-//         const isAverage = document.querySelector('#showAverage').checked;
-//         const isTotal = document.querySelector('#showTotal').checked;
+  // Fungsi reusable untuk render tabel (dipakai di 3 tabel berbeda)
+  function renderTable(tbodySelector, data, getDisplayValueFunc, getSecondColFunc = null) {
+    const tbody = $(tbodySelector + ' tbody');
+    tbody.empty();
 
-//         fetch('/data/tenant/top-10')
-//             .then(response => response.json())
-//             .then(result => {
-//                 const tbody = document.querySelector('#attackSourceIP tbody');
-//                 tbody.innerHTML = '';
+    data.forEach((item, index) => {
+      let displayValue = getDisplayValueFunc(item);
 
-//                 const data = result.total_attack?.data || [];
-//                 console.log(data);
+      const secondCol = getSecondColFunc ? getSecondColFunc(item) : '';
 
-//                 data.forEach((item, index) => {
-//                     let displayValue = '';
+      const row = $('<tr>');
+      row.append(`<td>${index + 1}.</td>`);
+      if (secondCol) {
+        row.append(`<td>${secondCol}</td>`);
+      } else {
+        row.append(`<td>${item.eventid || item.source_address || item.sensor || '<span style="opacity:0.5">-</span>'}</td>`);
+      }
+      row.append(`<td>${displayValue}</td>`);
+      tbody.append(row);
 
-//                     if (isDay && isAverage) {
-//                         displayValue = item.average_per_day;
-//                     } else if (isHour && isAverage) {
-//                         displayValue = item.average_per_hour;
-//                     } else if ((isDay && isTotal) || (isHour && isTotal)) {
-//                         displayValue = item.total_attack;
-//                     } else {
-//                         displayValue = '-';
-//                     }
+      if (index === 0) {
+        row.addClass('highlight-row');
+        setTimeout(() => row.removeClass('highlight-row'), 10000);
+      }
+    });
+  }
 
-//                     const row = `
-//                             <td>${index + 1}.</td>
-//                             <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
-//                             <td>${displayValue || '<span style="opacity:0.5">-</span>'}</td>
-//                     `;
-//                     tbody.insertAdjacentHTML('beforeend', row);
+  // Fetch data dan render top 10 IP attacker
+  function fetchTableData() {
+    const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
-//                     if (index === 0) {
-//                         const firstRow = tbody.querySelector('tr');
-//                         if (firstRow) {
-//                             firstRow.classList.add('highlight-row');
-//                             setTimeout(() => {
-//                                 firstRow.classList.remove('highlight-row');
-//                             }, 10000);
-//                         }
-//                     }
-//                 });
-//             })
-//             .catch(error => {
-//                 console.error('Error fetching top 10 data:', error);
-//             });
-//     }
+    $.getJSON('/data/guest/top-10', function (result) {
+      const data = result.total_attack?.data || [];
 
-//     fetchTableDataSourceIp();
-//     setInterval(fetchTableDataSourceIp, 60000);
+      renderTable(
+        '#top10IpAttacker',
+        data,
+        item => {
+          if (isDay && isAverage) return item.average_day || '-';
+          if (isHour && isAverage) return item.average_hour || '-';
+          if ((isDay && isTotal) || (isHour && isTotal)) return item.total_attack || '-';
+          return '-';
+        },
+        item => item.eventid || '<span style="opacity:0.5">-</span>'
+      );
+    }).fail(() => {
+      $('#top10Summary').text('Failed to load data.');
+    });
+  }
 
-//     document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
-//         .forEach(el => el.addEventListener('change', fetchTableDataSourceIp));
+  // Fetch data dan render attack source IP
+  function fetchTableDataSourceIp() {
+    const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
+    $.getJSON('/data/guest/top-10', function (result) {
+      const data = result.total_attack?.data || [];
 
+      renderTable(
+        '#attackSourceIP',
+        data,
+        item => {
+          if (isDay && isAverage) return item.average_day || '-';
+          if (isHour && isAverage) return item.average_hour || '-';
+          if ((isDay && isTotal) || (isHour && isTotal)) return item.total_attack || '-';
+          return '-';
+        },
+        item => item.source_address || '<span style="opacity:0.5">-</span>'
+      );
+    }).fail(() => {
+      $('#top10Summary').text('Failed to load data.');
+    });
+  }
 
-//     function fetchTableData() {
-//         const isDay = document.querySelector('#showDay').checked;
-//         const isHour = document.querySelector('#showHour').checked;
-//         const isAverage = document.querySelector('#showAverage').checked;
-//         const isTotal = document.querySelector('#showTotal').checked;
+  // Update attack sensor average/total list
+  function updateAverage() {
+    const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
-//         fetch('/data/tenant/top-10')
-//             .then(response => response.json())
-//             .then(result => {
-//                 const tbody = document.querySelector('#top10IpAttacker tbody');
-//                 tbody.innerHTML = '';
+    $.ajax({
+      url: '/data/guest/get-attack-sensor-average',
+      method: 'GET',
+      success: function (response) {
+        const container = $('#totalAttackAverage');
+        const data = response.sensor_attack?.data || [];
 
-//                 const data = result.total_attack?.data || [];
-//                 console.log(data);
+        if (isDay && isAverage) {
+          renderSensorList(container, data, item => item.average_per_hour ?? 0);
+        } else if (isDay && isTotal) {
+          renderSensorList(container, data, item => item.total_per_day ?? 0);
+        } else if (isHour && isTotal) {
+          renderSensorList(container, data, item => item.average_per_hour ?? 0);
+        } else if (isHour && isAverage) {
+          renderSensorList(container, data, item => item.average_per_minute ?? 0);
+        } else {
+          container.text('No data to show');
+        }
+      },
+      error: function () {
+        $('#totalAttackAverage').text('Failed to load');
+      },
+    });
+  }
 
-//                 data.forEach((item, index) => {
-//                     let displayValue = '';
+  // Fetch sensor attack count
+  function fetchSensorAttackCount() {
+    const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
-//                     if (isDay && isAverage) {
-//                         displayValue = item.average_per_day;
-//                     } else if (isHour && isAverage) {
-//                         displayValue = item.average_per_hour;
-//                     } else if ((isDay && isTotal) || (isHour && isTotal)) {
-//                         displayValue = item.total_attack;
-//                     } else {
-//                         displayValue = '-';
-//                     }
+    $.getJSON('/data/guest/get-attack-sensor-count', function (result) {
+      const data = result.sensor_attack?.data || [];
 
-//                     const row = `
-//                             <td>${index + 1}.</td>
-//                             <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
-//                             <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
-//                             <td>${displayValue || '<span style="opacity:0.5">-</span>'}</td>
-//                     `;
-//                     tbody.insertAdjacentHTML('beforeend', row);
+      renderTable(
+        '#attackSensor',
+        data,
+        item => {
+          if (isDay && isAverage) return item.average_per_day ?? 0;
+          if (isHour && isAverage) return item.average_per_hour ?? 0;
+          if ((isDay && isTotal) || (isHour && isTotal)) return item.total ?? 0;
+          return '-';
+        },
+        item => item.sensor || '-'
+      );
+    }).fail((error) => {
+      console.error('Error fetching sensor attack count:', error);
+    });
+  }
+  function triggerAllUpdates() {
+    updateDisplay();
+    fetchTableData();
+    fetchTableDataSourceIp();
+    updateAverage();
+    fetchSensorAttackCount();
+  }
 
-//                     if (index === 0) {
-//                         const firstRow = tbody.querySelector('tr');
-//                         if (firstRow) {
-//                             firstRow.classList.add('highlight-row');
-//                             setTimeout(() => {
-//                                 firstRow.classList.remove('highlight-row');
-//                             }, 10000);
-//                         }
-//                     }
-//                 });
-//             })
-//             .catch(error => {
-//                 console.error('Error fetching top 10 data:', error);
-//             });
-//     }
+  setupCheckboxExclusivity();
 
-//     fetchTableData();
-//     setInterval(fetchTableData, 60000);
+  $('#showDay, #showHour, #showAverage, #showTotal').change(triggerAllUpdates);
 
-//     document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
-//         .forEach(el => el.addEventListener('change', fetchTableData));
-// </script>
+  triggerAllUpdates();
 
-// <script>
-//  $(document).ready(function() {
+  setInterval(triggerAllUpdates, 60000);
+});
+
+// $(document).ready(function() {
 //     function updateDisplay() {
 //         const isDay = $('#showDay').is(':checked');
 //         const isHour = $('#showHour').is(':checked');
@@ -817,7 +872,7 @@ $(document).ready(function () {
 //         const isTotal = $('#showTotal').is(':checked');
 
 //         $.ajax({
-//             url: '/data/tenant/total-attack',
+//             url: 'data/guest/get-total-attack-sensor-average',
 //             method: 'GET',
 //             success: function(response) {
 //                 const container = $('#totalAttack');
@@ -872,309 +927,121 @@ $(document).ready(function () {
 //     updateDisplay();
 // });
 
-// $(document).ready(function() {
-//     function updateAverage() {
-//         const isDay = $('#showDay').is(':checked');
-//         const isHour = $('#showHour').is(':checked');
-//         const isAverage = $('#showAverage').is(':checked');
-//         const isTotal = $('#showTotal').is(':checked');
 
-//         $.ajax({
-//             url: '/data/tenant/average',
-//             method: 'GET',
-//             success: function(response) {
-//                 const container = $('#totalAttackAverage');
-//                 container.empty();
+//    function fetchTableData() {
+//     const isDay = document.querySelector('#showDay').checked;
+//     const isHour = document.querySelector('#showHour').checked;
+//     const isAverage = document.querySelector('#showAverage').checked;
+//     const isTotal = document.querySelector('#showTotal').checked;
 
-//                 const data = response.sensor_attack?.data || [];
+//     fetch('/data/guest/top-10')
+//         .then(response => response.json())
+//         .then(result => {
+//             const tbody = document.querySelector('#top10IpAttacker tbody');
+//             tbody.innerHTML = '';
+
+//             const data = result.total_attack?.data || [];
+
+//             data.forEach((item, index) => {
+//                 let displayValue = '';
 
 //                 if (isDay && isAverage) {
-//                     const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
-
-//                     data.forEach(item => {
-//                         const sensorName = item.sensor || 'Unknown';
-//                         const averagePerHour = item.average_per_hour ?? 0;
-//                         const li = $(`
-//                                             <li style="display: flex; justify-content: space-between;">
-//                                                 <span>${sensorName}</span>
-//                                                 <span>${averagePerHour}</span>
-//                                             </li>
-//                                         `);
-
-//                         ul.append(li);
-//                     });
-//                     container.append(ul);
-
-//                 } else if (isDay && isTotal) {
-
-//                     const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
-
-//                     data.forEach(item => {
-//                         const sensorName = item.sensor || 'Unknown';
-//                         const total = item.total_per_day ?? 0;
-//                         const li = $(`
-//                                             <li style="display: flex; justify-content: space-between;">
-//                                                 <span>${sensorName}</span>
-//                                                 <span>${total}</span>
-//                                             </li>
-//                                         `);
-
-//                         ul.append(li);
-//                     });
-
-//                     container.append(ul);
-
-//                 } else if (isHour && isTotal) {
-//                     const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
-
-//                     data.forEach(item => {
-//                         const sensorName = item.sensor || 'Unknown';
-//                         const averagePerDay = item.average_per_hour ?? 0;
-//                         const li = $(`
-//                                             <li style="display: flex; justify-content: space-between;">
-//                                                 <span>${sensorName}</span>
-//                                                 <span>${averagePerDay}</span>
-//                                             </li>
-//                                         `);
-
-//                         ul.append(li);
-//                     });
-//                     container.append(ul);
-
+//                     displayValue = item.average_day;
 //                 } else if (isHour && isAverage) {
-//                     const ul = $('<ul style="text-align: right"></ul>').addClass('list-unstyled mb-0');
-
-//                     data.forEach(item => {
-//                         const sensorName = item.sensor || 'Unknown';
-//                         const averagePerHour = item.average_per_minute ?? 0;
-//                         const li = $(`
-//                                             <li style="display: flex; justify-content: space-between;">
-//                                                 <span>${sensorName}</span>
-//                                                 <span>${averagePerHour}</span>
-//                                             </li>
-//                                         `);
-
-//                         ul.append(li);
-//                     });
-//                     container.append(ul);
-                    
+//                     displayValue = item.average_hour;
+//                 } else if (isDay && isTotal || isHour && isTotal) {
+//                     displayValue = item.total_attack;
 //                 } else {
-//                     container.text('No data to show');
+//                     displayValue = '-';
 //                 }
-//             },
-//             error: function() {
-//                 $('#totalAttackAverage').text('Failed to load');
-//             }
+
+//                 const row = document.createElement('tr');
+//                 row.innerHTML = `
+//                     <td>${index + 1}.</td>
+//                     <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
+//                     <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
+//                     <td>${displayValue}</td>
+//                 `;
+//                 tbody.appendChild(row);
+
+//                 if (index === 0) {
+//                     row.classList.add('highlight-row');
+//                     setTimeout(() => {
+//                         row.classList.remove('highlight-row');
+//                     }, 10000);
+//                 }
+//             });
+//         })
+//         .catch(error => {
+//             console.error('Error fetching top 10 data:', error);
+//             document.getElementById('top10Summary').textContent = 'Failed to load data.';
 //         });
 //     }
 
-//     // Ensure exclusivity
-//     $('#showAverage').on('change', function () {
-//         if (this.checked) $('#showTotal').prop('checked', false);
-//         updateAverage();
-//     });
+//     fetchTableData();
+//     setInterval(fetchTableData, 60000);
 
-//     $('#showTotal').on('change', function () {
-//         if (this.checked) $('#showAverage').prop('checked', false);
-//         updateAverage();
-//     });
-
-//     $('#showHour').on('change', function () {
-//         if (this.checked) $('#showDay').prop('checked', false);
-//         updateAverage();
-//     });
-
-//     $('#showDay').on('change', function () {
-//         if (this.checked) $('#showHour').prop('checked', false);
-//         updateAverage();
-//     });
-
-//     updateAverage();
-// });
-</script>
-@endauth
-@endif
-
-@guest
-<script>
-$(document).ready(function() {
-    function updateDisplay() {
-        const isDay = $('#showDay').is(':checked');
-        const isHour = $('#showHour').is(':checked');
-        const isAverage = $('#showAverage').is(':checked');
-        const isTotal = $('#showTotal').is(':checked');
-
-        $.ajax({
-            url: 'data/guest/get-total-attack-sensor-average',
-            method: 'GET',
-            success: function(response) {
-                const container = $('#totalAttack');
-                container.empty();
-
-                let value = null;
-
-                if (isDay && isAverage) {
-                    value = response.average_total_attack_per_day;
-                    container.text(`${value}`);
-                } else if (isDay && isTotal) {
-                    value = response.total_attack;
-                    container.text(`${value}`);
-                } else if (isHour && isTotal) {
-                    value = response.average_total_attack_per_day;
-                    container.text(`${value}`);
-                } else if (isHour && isAverage) {
-                    value = response.average_total_attack_per_minute;
-                    container.text(`${value}`);
-                } else {
-                    container.text('No data to show');
-                }
-            },
-            error: function() {
-                $('#totalAttack').text('Failed to load');
-            }
-        });
-    }
-
-    // Ensure exclusivity
-    $('#showAverage').on('change', function () {
-        if (this.checked) $('#showTotal').prop('checked', false);
-        updateDisplay();
-    });
-
-    $('#showTotal').on('change', function () {
-        if (this.checked) $('#showAverage').prop('checked', false);
-        updateDisplay();
-    });
-
-    $('#showHour').on('change', function () {
-        if (this.checked) $('#showDay').prop('checked', false);
-        updateDisplay();
-    });
-
-    $('#showDay').on('change', function () {
-        if (this.checked) $('#showHour').prop('checked', false);
-        updateDisplay();
-    });
-
-    // Load default view
-    updateDisplay();
-});
-
-
-   function fetchTableData() {
-    const isDay = document.querySelector('#showDay').checked;
-    const isHour = document.querySelector('#showHour').checked;
-    const isAverage = document.querySelector('#showAverage').checked;
-    const isTotal = document.querySelector('#showTotal').checked;
-
-    fetch('/data/guest/top-10')
-        .then(response => response.json())
-        .then(result => {
-            const tbody = document.querySelector('#top10IpAttacker tbody');
-            tbody.innerHTML = '';
-
-            const data = result.total_attack?.data || [];
-
-            data.forEach((item, index) => {
-                let displayValue = '';
-
-                if (isDay && isAverage) {
-                    displayValue = item.average_day;
-                } else if (isHour && isAverage) {
-                    displayValue = item.average_hour;
-                } else if (isDay && isTotal || isHour && isTotal) {
-                    displayValue = item.total_attack;
-                } else {
-                    displayValue = '-';
-                }
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${index + 1}.</td>
-                    <td>${item.eventid || '<span style="opacity:0.5">-</span>'}</td>
-                    <td>${item.target_port || '<span style="opacity:0.5">-</span>'}</td>
-                    <td>${displayValue}</td>
-                `;
-                tbody.appendChild(row);
-
-                if (index === 0) {
-                    row.classList.add('highlight-row');
-                    setTimeout(() => {
-                        row.classList.remove('highlight-row');
-                    }, 10000);
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching top 10 data:', error);
-            document.getElementById('top10Summary').textContent = 'Failed to load data.';
-        });
-    }
-
-    fetchTableData();
-    setInterval(fetchTableData, 60000);
-
-    document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
-    .forEach(el => el.addEventListener('change', fetchTableData));
+//     document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
+//     .forEach(el => el.addEventListener('change', fetchTableData));
 
 
 
-function fetchTableDataSourceIp() {
-    const isDay = document.querySelector('#showDay').checked;
-    const isHour = document.querySelector('#showHour').checked;
-    const isAverage = document.querySelector('#showAverage').checked;
-    const isTotal = document.querySelector('#showTotal').checked;
+// function fetchTableDataSourceIp() {
+//     const isDay = document.querySelector('#showDay').checked;
+//     const isHour = document.querySelector('#showHour').checked;
+//     const isAverage = document.querySelector('#showAverage').checked;
+//     const isTotal = document.querySelector('#showTotal').checked;
 
-    fetch('/data/guest/top-10')
-        .then(response => response.json())
-        .then(result => {
-            const tbody = document.querySelector('#attackSourceIP tbody');
-            tbody.innerHTML = '';
+//     fetch('/data/guest/top-10')
+//         .then(response => response.json())
+//         .then(result => {
+//             const tbody = document.querySelector('#attackSourceIP tbody');
+//             tbody.innerHTML = '';
 
-            const data = result.total_attack?.data || [];
+//             const data = result.total_attack?.data || [];
 
-            data.forEach((item, index) => {
-                let displayValue = '';
+//             data.forEach((item, index) => {
+//                 let displayValue = '';
 
-                if (isDay && isAverage) {
-                    displayValue = item.average_day;
-                } else if (isHour && isAverage) {
-                    displayValue = item.average_hour;
-                } else if (isDay && isTotal || isHour && isTotal) {
-                    displayValue = item.total_attack;
-                } else {
-                    displayValue = '-';
-                }
+//                 if (isDay && isAverage) {
+//                     displayValue = item.average_day;
+//                 } else if (isHour && isAverage) {
+//                     displayValue = item.average_hour;
+//                 } else if (isDay && isTotal || isHour && isTotal) {
+//                     displayValue = item.total_attack;
+//                 } else {
+//                     displayValue = '-';
+//                 }
 
-                 const row = document.createElement('tr');
-                    row.innerHTML = `
-                            <td>${index + 1}.</td>
-                            <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
-                            <td>${displayValue || '<span style="opacity:0.5">-</span>'}</td>
-                    `;
-                    tbody.appendChild(row);
+//                  const row = document.createElement('tr');
+//                     row.innerHTML = `
+//                             <td>${index + 1}.</td>
+//                             <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
+//                             <td>${displayValue || '<span style="opacity:0.5">-</span>'}</td>
+//                     `;
+//                     tbody.appendChild(row);
 
-                if (index === 0) {
-                    row.classList.add('highlight-row');
-                    setTimeout(() => {
-                        row.classList.remove('highlight-row');
-                    }, 10000);
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching top 10 data:', error);
-            document.getElementById('top10Summary').textContent = 'Failed to load data.';
-        });
-    }
+//                 if (index === 0) {
+//                     row.classList.add('highlight-row');
+//                     setTimeout(() => {
+//                         row.classList.remove('highlight-row');
+//                     }, 10000);
+//                 }
+//             });
+//         })
+//         .catch(error => {
+//             console.error('Error fetching top 10 data:', error);
+//             document.getElementById('top10Summary').textContent = 'Failed to load data.';
+//         });
+//     }
 
-    fetchTableDataSourceIp();
-    setInterval(fetchTableDataSourceIp, 60000);
+//     fetchTableDataSourceIp();
+//     setInterval(fetchTableDataSourceIp, 60000);
 
-    document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
-    .forEach(el => el.addEventListener('change', fetchTableDataSourceIp));
-</script>
-
+//     document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
+//     .forEach(el => el.addEventListener('change', fetchTableDataSourceIp));
+// </script>
+{{-- 
 <script>
 
 $(document).ready(function() {
@@ -1298,9 +1165,9 @@ $(document).ready(function() {
     updateAverage();
 });
 
-</script>
+</script> --}}
 
-<script>
+{{-- <script>
 function fetchSensorAttackCount() {
     const isDay = document.querySelector('#showDay').checked;
     const isHour = document.querySelector('#showHour').checked;
@@ -1351,7 +1218,7 @@ fetchSensorAttackCount();
 setInterval(fetchSensorAttackCount, 60000);
 
 document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
-    .forEach(el => el.addEventListener('change', fetchSensorAttackCount));
+    .forEach(el => el.addEventListener('change', fetchSensorAttackCount)); --}}
 
 </script>
 @endguest
