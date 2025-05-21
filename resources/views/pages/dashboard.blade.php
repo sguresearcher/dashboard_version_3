@@ -593,7 +593,7 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
                 const tbody = document.querySelector('#attackSourceIP tbody');
                 tbody.innerHTML = '';
 
-                const data = result.sensor_attack?.data || [];
+                const data = result.total_attack?.data || [];
                 console.log(data);
 
                 data.forEach((item, index) => {
