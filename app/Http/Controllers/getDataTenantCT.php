@@ -398,6 +398,8 @@ class getDataTenantCT extends Controller
                         'eventid' => $entry['protocol'],
                         'target_port' => $entry['port'],
                         'total_attack' => number_format($entry['total']),
+                        'average_per_day' => number_format($entry['total'] / 24),
+                        'average_per_hour' => number_format($entry['total'] / (24 * 60)),
                     ];
                 });
     
