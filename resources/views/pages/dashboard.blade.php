@@ -532,7 +532,8 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
     fetch('/data/tenant/get-attack-sensor-count')
         .then(response => response.json())
         .then(result => {
-            const tbody = $('#attackSensor tbody');
+            // const tbody = $('#attackSensor tbody');
+            const tbody = document.querySelector('#attackSensor tbody');
             tbody.innerHTML = '';
 
             const data = response.sensor_attack?.data || [];
