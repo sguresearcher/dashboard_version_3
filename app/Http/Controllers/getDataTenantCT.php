@@ -160,62 +160,45 @@ class getDataTenantCT extends Controller
     
 
     public function getSensorAttackCount() {
-    $response = Http::withHeaders([
-        'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
-    ])->timeout(180)->get('http://10.20.100.172:7777/summary/24h');
-
-    if ($response->successful()) {
-        $summary = $response->json();
-
-        $combined = collect();
-        foreach ($summary as $tenant => $data) {
-            foreach ($data['combined_attack'] ?? [] as $entry) {
-                $combined->push($entry);
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic ' . base64_encode($this->username . ':' . $this->password)
+        ])->timeout(180)->get('http://10.20.100.172:7777/summary/24h');
+    
+        if ($response->successful()) {
+            $summary = $response->json();
+    
+            $combined = collect();
+            foreach ($summary as $tenant => $data) {
+                foreach ($data['combined_attack'] ?? [] as $entry) {
+                    $combined->push($entry);
+                }
             }
+    
+            $sensorCounts = $combined->groupBy('sensor')
+                ->map(function ($items, $sensor) {
+                    return [
+                        'sensor' => $sensor ?? 'unknown',
+                        'total' => number_format($items->count()),
+                        'average_per_hour' => number_format(round($items->sum('total') / (24 * 60))),
+                        'average_per_day' => number_format(round($items->sum('total') / 24)),
+                        'total_raw' => $items->count()
+                    ];
+                })
+                ->sortByDesc('total_raw')
+                ->take(10)
+                ->values();
+    
+            return response()->json([
+                'sensor_attack' => [
+                    'data' => $sensorCounts
+                ]
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Failed to fetch data!'
+            ], 404);
         }
-
-        $sensorCounts = $combined->groupBy('sensor')
-            ->map(function ($items, $sensor) {
-                // Option 1: If you want to use the count of entries for everything
-                $totalCount = $items->count();
-                
-                return [
-                    'sensor' => $sensor ?? 'unknown',
-                    'total' => number_format($totalCount),
-                    'average_per_hour' => number_format(round($totalCount / 24)),  // Divide by hours in a day
-                    'average_per_day' => number_format(round($totalCount * 1)),    // Same as total for a day
-                    'total_raw' => $totalCount
-                ];
-                
-                // Option 2: If each entry has its own 'total' field and you want to sum them
-                /*
-                $totalCount = $items->count();
-                $totalSum = $items->sum('total');
-                
-                return [
-                    'sensor' => $sensor ?? 'unknown',
-                    'total' => number_format($totalCount),
-                    'average_per_hour' => number_format(round($totalSum / 24)),    // Sum of all totals divided by hours
-                    'average_per_day' => number_format(round($totalSum)),          // Sum of all totals for a day
-                    'total_raw' => $totalCount
-                ];
-                */
-            })
-            ->sortByDesc('total_raw')
-            ->take(10)
-            ->values();
-
-        return response()->json([
-            'sensor_attack' => [
-                'data' => $sensorCounts
-            ]
-        ], 200);
-    } else {
-        return response()->json([
-            'message' => 'Failed to fetch data!'
-        ], 404);
     }
-}
     
     
     public function getSensorAverageAttackCount()
