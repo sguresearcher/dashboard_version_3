@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\getDataTenantCT;
-use App\Http\Controllers\GuestCT;
 use App\Http\Controllers\LoginCT;
 use App\Http\Controllers\MonitoringSensorCT;
 use App\Http\Controllers\SuperadminCT;
