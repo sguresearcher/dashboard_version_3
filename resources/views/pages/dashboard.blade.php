@@ -609,7 +609,7 @@ document.querySelectorAll('#showDay, #showHour, #showAverage, #showTotal')
                         displayValue = '-';
                     }
 
-                   row.innerHTML = `
+                    const row = `
                             <td>${index + 1}.</td>
                             <td>${item.source_address || '<span style="opacity:0.5">-</span>'}</td>
                             <td>${displayValue || '<span style="opacity:0.5">-</span>'}</td>
