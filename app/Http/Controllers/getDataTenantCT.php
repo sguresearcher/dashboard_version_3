@@ -176,12 +176,13 @@ class getDataTenantCT extends Controller
     
             $sensorCounts = $combined->groupBy('sensor')
                 ->map(function ($items, $sensor) {
+                     $totalSum = $items->sum('total');
                     return [
                         'sensor' => $sensor ?? 'unknown',
-                        'total' => number_format($items->count()),
-                        'average_per_hour' => number_format(round($items->sum('total') / (24 * 60))),
-                        'average_per_day' => number_format(round($items->sum('total') / 24)),
-                        'total_raw' => $items->count()
+                        'total' => number_format($totalSum),
+                        'average_per_hour' => number_format(round($totalSum / (24 * 60))),
+                        'average_per_day' => number_format(round($totalSum / (24))),
+                        'total_raw' => $totalSum
                     ];
                 })
                 ->sortByDesc('total_raw')
