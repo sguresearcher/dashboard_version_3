@@ -33,7 +33,7 @@
 		}
 
 		.table-scroll {
-						max-height: 40vh; /* atur tinggi sesuai kebutuhan */
+						max-height: 37vh; /* atur tinggi sesuai kebutuhan */
 						overflow-y: auto;
 						overflow-x: auto;
 						white-space: nowrap;
