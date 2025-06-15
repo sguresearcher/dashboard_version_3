@@ -95,41 +95,8 @@
 	{{-- <script src="{{ asset('assets/js/demo/dashboard.demo.js') }}"></script> --}}
 	<script src="{{ asset('assets/plugins/chart.js/dist/chart.umd.js') }}"></script>
 	{{-- <script src="{{ asset('assets/js/demo/chart-js.demo.js') }}"></script> --}}
-	
-	{{-- <script>
-		var ctx6 = document.getElementById('doughnutChart');
-			doughnutChart = new Chart(ctx6, {
-				type: 'doughnut',
-				data: {
-					labels: ['Example1', 'Example2'],
-					datasets: [{
-						data: [300, 100],
-						backgroundColor: [
-							'rgba(75, 192, 192, 0.75)',
-							'rgba(201, 203, 207, 0.75)'
-						],
-						hoverBackgroundColor: [
-							'rgba(75, 192, 192, 1)',
-							'rgba(201, 203, 207, 1)'
-						],
-						borderWidth: 0
-					}]
-				},
-				options: {
-					plugins: {
-						legend: {
-							labels: {
-								color: 'white',
-								font: {
-									size: 14 // (Opsional) Ubah ukuran font jika diperlukan
-								}
-							}
-						}
-					}
-				}
-			});
-
-	</script> --}}
+	 <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
 	@stack('js')
+
 </body>
 </html>

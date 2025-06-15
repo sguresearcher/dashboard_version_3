@@ -632,6 +632,9 @@ $(document).ready(function () {
 
 @guest
 <script>
+    const socket = io("http://10.20.100.172:3330");
+    const ipAttackMap = {};
+
 $(document).ready(function () {
   function getCheckboxStatus() {
     return {
@@ -758,23 +761,44 @@ $(document).ready(function () {
   }
 
   function fetchTableData() {
-    const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
+  const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
-    $.getJSON('/data/guest/top-10', function(result) {
-      const data = result.total_attack?.data || [];
+  const sortedData = Object.entries(ipAttackMap)
+    .map(([ip, data]) => ({ ip, ...data }))
+    .sort((a, b) => b.total_attack - a.total_attack)
+    .slice(0, 10);
 
-      const displayValueFn = item => {
-        if (isDay && isAverage) return item.average_day || '-';
-        if (isHour && isAverage) return item.average_hour || '-';
-        if ((isDay && isTotal) || (isHour && isTotal)) return item.total_attack || '-';
-        return '-';
-      };
+  const displayValueFn = item => {
+    if (isDay && isAverage) return item.average_day || '-';
+    if (isHour && isAverage) return item.average_hour || '-';
+    if ((isDay && isTotal) || (isHour && isTotal)) return item.total_attack || '-';
+    return '-';
+  };
 
-      renderSensorList('#top10IpAttacker tbody', data, ['eventid', 'target_port'], displayValueFn);
-    }).fail(() => {
-      $('#top10Summary').text('Failed to load data.');
-    });
+  renderSensorList('#top10IpAttacker tbody', sortedData, ['eventid', 'target_port'], displayValueFn);
+}
+
+// Tangani data masuk dari WebSocket
+socket.on("new_log", (msg) => {
+  const ip = msg.data?.src_ip || msg.data?.remote_ip;
+  if (!ip) return;
+
+  if (!ipAttackMap[ip]) {
+    ipAttackMap[ip] = {
+      total_attack: 1,
+      average_day: 1,
+      average_hour: 1,
+      eventid: msg.data.eventid || '-',
+      target_port: msg.data.target_port || '-',
+    };
+  } else {
+    ipAttackMap[ip].total_attack += 1;
+    ipAttackMap[ip].average_day = ipAttackMap[ip].total_attack / 1; // Placeholder
+    ipAttackMap[ip].average_hour = ipAttackMap[ip].total_attack / 1;
   }
+
+  fetchTableData(); // <--- tetap pakai nama lama
+});
 
   function fetchTableDataSourceIp() {
     const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
