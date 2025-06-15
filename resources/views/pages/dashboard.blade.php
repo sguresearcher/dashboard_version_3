@@ -632,7 +632,7 @@ $(document).ready(function () {
 
 @guest
 <script>
-    const socket = io("http://10.20.100.172:3330");
+    const socket = io("http://your-domain.com");
     const ipAttackMap = {};
 
 $(document).ready(function () {
