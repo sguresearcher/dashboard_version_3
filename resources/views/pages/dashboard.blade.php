@@ -161,7 +161,7 @@ socket.on("new_log", (msg) => {
 
     const ip = data.src_ip || data.remote_ip || 'N/A';
     const country = geo.country || 'Unknown';
-    const countryFlag = countryCode
+    const countryFlag = country
     ? `<img src="/assets/img/flags/${country}.svg" alt="${country}" title="${country}" width="24" height="18" />`
     : country;
     const city = geo.city || '-';
