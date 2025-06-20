@@ -119,9 +119,88 @@
             </div>
         </div>
     </div>
+
+    <div class="col-md-12 mb-4">
+    <div class="card border-0">
+        <div class="card-body table-scroll">
+            <h5>Live Attacks from WebSocket</h5>
+            <table id="liveAttackTable" class="table table-bordered table-hover">
+                <thead>
+    <tr>
+        <th>Sensor</th>
+        <th>Source IP</th>
+        <th>Country</th>
+        <th>City</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+        <th>Timestamp</th>
+    </tr>
+</thead>
+
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
 </div>
 @endsection
 @push('js')
+
+<script>
+const socket = io("http://10.20.100.172:3330");
+
+$(document).ready(function () {
+    let liveAttackIndex = 1;
+
+socket.on("new_log", (msg) => {
+    const sensor = msg.sensor || 'unknown';
+    const data = msg.data || {};
+    const geo = msg.geo || {};
+
+    // ❌ Filter: hanya sensor "all"
+//    if (sensor !== 'all') return;
+
+//    const ts = data.timestamp;
+  //  if (!ts) return;
+   // const now = new Date();
+   // const logTime = new Date(ts);
+   // const diffHours = (now - logTime) / (1000 * 60 * 60);
+   // if (diffHours > 24) return;
+
+    // ✅ Tampilkan jika lolos filter
+    const ip = data.src_ip || data.remote_ip || 'N/A';
+    const country = geo.country || 'Unknown';
+    const city = geo.city || '-';
+    const lat = geo.latitude ?? '-';
+    const lon = geo.longitude ?? '-';
+
+    const newRow = `
+        <tr>
+            <td>${sensor}</td>
+            <td>${ip}</td>
+            <td>${country}</td>
+            <td>${city}</td>
+            <td>${lat}</td>
+            <td>${lon}</td>
+            <td>${data.timestamp || '-'}</td>
+        </tr>
+    `;
+
+    const tbody = $('#liveAttackTable tbody');
+    tbody.prepend(newRow);
+
+    if (tbody.children().length > 50) {
+        tbody.children().last().remove();
+    }
+});
+
+
+});
+</script>
+
+
 
 @auth
 @if (auth()->user()->role == 'superadmin')
@@ -778,27 +857,70 @@ $(document).ready(function () {
   renderSensorList('#top10IpAttacker tbody', sortedData, ['eventid', 'target_port'], displayValueFn);
 }
 
-// Tangani data masuk dari WebSocket
+// Tambahkan variabel array liveLogs di awal script di dalam $(document).ready()
+let liveLogs = [];
+
 socket.on("new_log", (msg) => {
-  const ip = msg.data?.src_ip || msg.data?.remote_ip;
-  if (!ip) return;
+    const sensor = msg.sensor || 'unknown';
+    const data = msg.data || {};
+    const geo = msg.geo || {};
 
-  if (!ipAttackMap[ip]) {
-    ipAttackMap[ip] = {
-      total_attack: 1,
-      average_day: 1,
-      average_hour: 1,
-      eventid: msg.data.eventid || '-',
-      target_port: msg.data.target_port || '-',
-    };
-  } else {
-    ipAttackMap[ip].total_attack += 1;
-    ipAttackMap[ip].average_day = ipAttackMap[ip].total_attack / 1; // Placeholder
-    ipAttackMap[ip].average_hour = ipAttackMap[ip].total_attack / 1;
-  }
+    const tsStr = data.timestamp;
+    if (!tsStr) return; // abaikan jika tidak ada timestamp
 
-  fetchTableData(); // <--- tetap pakai nama lama
+    const logTime = new Date(tsStr);
+    const now = new Date();
+
+    // Batasi data yang lebih dari 60 menit (1 jam) lalu
+    const diffMinutes = (now - logTime) / (1000 * 60);
+    if (diffMinutes > 60) return;
+
+    const ip = data.src_ip || data.remote_ip || 'N/A';
+    const country = geo.country || 'Unknown';
+    const city = geo.city || '-';
+    const lat = geo.latitude ?? '-';
+    const lon = geo.longitude ?? '-';
+
+    // Simpan data ke array liveLogs
+    liveLogs.push({
+        sensor,
+        ip,
+        country,
+        city,
+        lat,
+        lon,
+        timestamp: tsStr,
+        timeObj: logTime
+    });
+
+    // Urutkan liveLogs berdasar waktu terbaru
+    liveLogs.sort((a, b) => b.timeObj - a.timeObj);
+
+    // Batasi hanya 10 data terbaru
+    if (liveLogs.length > 10) {
+        liveLogs = liveLogs.slice(0, 10);
+    }
+
+    // Render ulang tabel
+    const tbody = $('#liveAttackTable tbody');
+    tbody.empty();
+
+    liveLogs.forEach(log => {
+        const newRow = `
+            <tr>
+                <td>${log.sensor}</td>
+                <td>${log.ip}</td>
+                <td>${log.country}</td>
+                <td>${log.city}</td>
+                <td>${log.lat}</td>
+                <td>${log.lon}</td>
+                <td>${log.timestamp}</td>
+            </tr>
+        `;
+        tbody.append(newRow);
+    });
 });
+
 
   function fetchTableDataSourceIp() {
     const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
