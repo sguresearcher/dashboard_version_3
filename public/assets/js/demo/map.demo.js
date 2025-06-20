@@ -1,5 +1,6 @@
 console.log(typeof jvm !== 'undefined' ? "jvm tersedia" : "jvm TIDAK tersedia");
 console.log(typeof jvm.WorldMap !== 'undefined' ? "Peta world_mill tersedia" : "Peta world_mill TIDAK tersedia");
+const socket = io("http://10.20.100.172:3330");
 
 var attackLocations = [
     { from: [37.7749, -122.4194], to: [-6.2000, 106.8167] }, 

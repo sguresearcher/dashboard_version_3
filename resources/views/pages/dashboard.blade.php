@@ -159,19 +159,11 @@ socket.on("new_log", (msg) => {
     const data = msg.data || {};
     const geo = msg.geo || {};
 
-    // ❌ Filter: hanya sensor "all"
-//    if (sensor !== 'all') return;
-
-//    const ts = data.timestamp;
-  //  if (!ts) return;
-   // const now = new Date();
-   // const logTime = new Date(ts);
-   // const diffHours = (now - logTime) / (1000 * 60 * 60);
-   // if (diffHours > 24) return;
-
-    // ✅ Tampilkan jika lolos filter
     const ip = data.src_ip || data.remote_ip || 'N/A';
     const country = geo.country || 'Unknown';
+    const countryFlag = countryCode
+    ? `<img src="/assets/img/flags/${country}.svg" alt="${country}" title="${country}" width="24" height="18" />`
+    : country;
     const city = geo.city || '-';
     const lat = geo.latitude ?? '-';
     const lon = geo.longitude ?? '-';
@@ -180,7 +172,7 @@ socket.on("new_log", (msg) => {
         <tr>
             <td>${sensor}</td>
             <td>${ip}</td>
-            <td>${country}</td>
+            <td>${countryFlag}</td>
             <td>${city}</td>
             <td>${lat}</td>
             <td>${lon}</td>
