@@ -172,7 +172,7 @@ socket.on("new_log", (msg) => {
         <tr>
             <td>${sensor}</td>
             <td>${ip}</td>
-            <td>${countryFlag}</td>
+            <td>${countryFlag} ${country}</td>
             <td>${city}</td>
             <td>${lat}</td>
             <td>${lon}</td>
