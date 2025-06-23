@@ -831,7 +831,7 @@ $(document).ready(function () {
     });
   }
 
-//   function fetchTableData() {
+  function fetchTableData() {
 //   const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
 //   const sortedData = Object.entries(ipAttackMap)
@@ -847,7 +847,7 @@ $(document).ready(function () {
 //   };
 
 //   renderSensorList('#top10IpAttacker tbody', sortedData, ['eventid', 'target_port'], displayValueFn);
-// }
+}
 
 // Tambahkan variabel array liveLogs di awal script di dalam $(document).ready()
 let liveLogs = [];
