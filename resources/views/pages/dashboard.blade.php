@@ -831,23 +831,23 @@ $(document).ready(function () {
     });
   }
 
-  function fetchTableData() {
-  const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
+//   function fetchTableData() {
+//   const { isDay, isHour, isAverage, isTotal } = getCheckboxStatus();
 
-  const sortedData = Object.entries(ipAttackMap)
-    .map(([ip, data]) => ({ ip, ...data }))
-    .sort((a, b) => b.total_attack - a.total_attack)
-    .slice(0, 10);
+//   const sortedData = Object.entries(ipAttackMap)
+//     .map(([ip, data]) => ({ ip, ...data }))
+//     .sort((a, b) => b.total_attack - a.total_attack)
+//     .slice(0, 10);
 
-  const displayValueFn = item => {
-    if (isDay && isAverage) return item.average_day || '-';
-    if (isHour && isAverage) return item.average_hour || '-';
-    if ((isDay && isTotal) || (isHour && isTotal)) return item.total_attack || '-';
-    return '-';
-  };
+//   const displayValueFn = item => {
+//     if (isDay && isAverage) return item.average_day || '-';
+//     if (isHour && isAverage) return item.average_hour || '-';
+//     if ((isDay && isTotal) || (isHour && isTotal)) return item.total_attack || '-';
+//     return '-';
+//   };
 
-  renderSensorList('#top10IpAttacker tbody', sortedData, ['eventid', 'target_port'], displayValueFn);
-}
+//   renderSensorList('#top10IpAttacker tbody', sortedData, ['eventid', 'target_port'], displayValueFn);
+// }
 
 // Tambahkan variabel array liveLogs di awal script di dalam $(document).ready()
 let liveLogs = [];
