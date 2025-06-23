@@ -183,7 +183,7 @@ socket.on("new_log", (msg) => {
     const tbody = $('#liveAttackTable tbody');
     tbody.prepend(newRow);
 
-    if (tbody.children().length > 50) {
+    if (tbody.children().length > 10) {
         tbody.children().last().remove();
     }
 });
