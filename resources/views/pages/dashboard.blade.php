@@ -703,8 +703,8 @@ $(document).ready(function () {
 
 @guest
 <script>
-    const socket = io("http://your-domain.com");
-    const ipAttackMap = {};
+    // const socket = io("http://your-domain.com");
+    // const ipAttackMap = {};
 
 $(document).ready(function () {
   function getCheckboxStatus() {
