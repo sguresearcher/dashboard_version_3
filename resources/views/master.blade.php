@@ -91,7 +91,7 @@
 	<!-- ================== BEGIN page-js ================== -->
 	<script src="{{ asset('assets/plugins/jvectormap-next/jquery-jvectormap.min.js') }}"></script>
 	<script src="{{ asset('assets/plugins/jvectormap-content/world-mill.js') }}"></script>
-	<script src="{{ asset('assets/js/demo/map.demo.js') }}" defer></script>
+	<script src="{{ asset('assets/js/demo/map.demo.js') }}"></script>
 	{{-- <script src="{{ asset('assets/js/demo/dashboard.demo.js') }}"></script> --}}
 	<script src="{{ asset('assets/plugins/chart.js/dist/chart.umd.js') }}"></script>
 	{{-- <script src="{{ asset('assets/js/demo/chart-js.demo.js') }}"></script> --}}
