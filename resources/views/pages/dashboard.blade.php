@@ -286,8 +286,9 @@ function loadAttackInformation() {
 
         const ip = data.src_ip || data.remote_ip || 'N/A';
         const country = geo.country || 'Unknown';
+        const encodedCountry = encodeURIComponent(country);
         const countryFlag = country
-            ? `<img src="/assets/img/flags/${country}.svg" alt="${country}" title="${country}" width="24" height="18" />`
+            ? `<img src="/assets/img/flags/${encodedCountry}.svg" alt="${country}" title="${country}" width="24" height="18" />`
             : country;
         const city = geo.city || '-';
         const lat = geo.latitude ?? '-';
