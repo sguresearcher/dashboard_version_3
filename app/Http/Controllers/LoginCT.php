@@ -7,36 +7,50 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginCT extends Controller
 {
-    public function index() {
+    public function index()
+    {
         return view('pages.login');
     }
 
-    public function auth(Request $request){
+    public function auth(Request $request)
+    {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
- 
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
- 
-            if (Auth::user()->role == 'superadmin') {
+
+            $role = Auth::user()->role;
+
+            //dd($role);
+
+            if ($role === 'superadmin') {
                 return redirect('/superadmin');
-            }else{
-                return redirect('/');
+            } elseif ($role === 'tenant') {
+                return redirect('/home');
+            } else {
+                Auth::logout();
+                return redirect('/login')->withErrors([
+                    'role' => 'Role tidak dikenali atau tidak diizinkan.',
+                ]);
             }
         }
- 
-        return back();
+
+        // Jika gagal login
+        return back()->withErrors([
+            'email' => 'Email atau password salah.',
+        ])->withInput($request->only('email'));
     }
 
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         Auth::logout();
- 
+
         $request->session()->invalidate();
-    
         $request->session()->regenerateToken();
-    
+
         return redirect('/');
     }
 }

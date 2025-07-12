@@ -119,7 +119,7 @@ function renderSensorStatus() {
 
 async function fetchLatestTimestamps() {
     try {
-        const response = await fetch("http://10.20.100.172:3330/latest-timestamps");
+        const response = await fetch("/latest-timestamps");
         const json = await response.json();
         const latestData = json.data || {};
 
@@ -144,8 +144,11 @@ async function fetchLatestTimestamps() {
     }
 }
 
-const socket = io("http://10.20.100.172:3330");
-
+//const socket = io("http://10.20.100.172:3330");
+const socket = io("wss://public2.cscisac.org", {
+    path: "/socket.io/",
+    transports: ["websocket"],
+});
 socket.on("connect", () => {
     console.log("WebSocket connected");
 });
